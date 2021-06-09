@@ -1,0 +1,100 @@
+group = 'com.viliussutkus89'
+
+apply plugin: 'com.android.library'
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+
+android {
+    compileSdkVersion 30
+    buildToolsVersion "30.0.3"
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 30
+
+        versionCode 1
+        versionName rootProject.version
+
+        archivesBaseName = rootProject.name
+
+        consumerProguardFiles 'proguard-rules.pro'
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+}
+
+dependencies {
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+
+    //#UNCOMMENT-DURING-STAGING#implementation 'com.viliussutkus89:samplelib:#STAGING-VERSION#'
+    // The line above is used by the scripts/prepareLibraryForStagingRepository
+}
+
+task sourceJar(type: Jar) {
+    archiveClassifier.set('sources')
+    into ("", { from android.sourceSets.main.java.srcDirs} )
+}
+
+task javadoc(type: Javadoc) {
+    options.encoding = 'UTF-8'
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    title = "${rootProject.name} ${project.version} API"
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    archiveClassifier.set('javadoc')
+    from javadoc.destinationDir
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+
+                artifactId rootProject.name
+                version = rootProject.version
+
+                artifact sourceJar
+                artifact javadocJar
+
+                pom {
+                    name = rootProject.name
+                    description = 'Sample_Android_Library-Sonatype_Published-Instrumented_Tests_In_Android_Emulator'
+                    url = 'https://github.com/ViliusSutkus89/Sample_Android_Library-Sonatype_Published-Instrumented_Tests_In_Android_Emulator'
+                    packaging = 'aar'
+                    inceptionYear = '2021'
+                    licenses {
+                        license {
+                            name = 'The GNU General Public License, Version 3'
+                            url = 'https://www.gnu.org/licenses/gpl-3.0.txt'
+                            distribution = 'repo'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = "ViliusSutkus89"
+                            name = "Vilius Sutkus"
+                            email = "ViliusSutkus89@gmail.com"
+                        }
+                    }
+                    scm {
+                        url = 'https://github.com/ViliusSutkus89/Sample_Android_Library-Sonatype_Published-Instrumented_Tests_In_Android_Emulator'
+                        connection = 'https://github.com/ViliusSutkus89/Sample_Android_Library-Sonatype_Published-Instrumented_Tests_In_Android_Emulator.git'
+                    }
+                }
+            }
+        }
+    }
+
+    // This may look ugly...
+    // but useInMemoryPgpKeys expects valid keys even with required { false }
+    if (System.getenv('SIGNING_KEY')) {
+        signing {
+            required { true }
+            useInMemoryPgpKeys(System.getenv('SIGNING_KEY'), System.getenv('SIGNING_PASS'))
+            sign publishing.publications.release
+        }
+    }
+}

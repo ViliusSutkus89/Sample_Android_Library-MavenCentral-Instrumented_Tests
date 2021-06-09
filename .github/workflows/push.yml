@@ -1,0 +1,173 @@
+name: onPush
+on:
+  push:
+    branches: [ master, main ]
+    paths-ignore: [ '**.md' ]
+
+permissions:
+  actions: none
+  checks: none
+  contents: none
+  deployments: none
+  issues: none
+  packages: none
+  pull-requests: none
+  repository-projects: none
+  security-events: none
+  statuses: none
+
+jobs:
+  build:
+    environment: BuildWithDeployToSonatype
+    outputs:
+      STAGING_REPO: ${{ steps.sonatype.outputs.stagingRepo }}
+      STAGING_REPO_URI: ${{ steps.sonatype.outputs.stagingRepoUri }}
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-java@v2
+        with:
+          distribution: zulu
+          java-version: 8
+      - uses: android-actions/setup-android@v2
+
+      - run: ./gradlew assembleRelease
+
+      - run: ./gradlew publishToMavenLocal
+        env:
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          SIGNING_PASS: ${{ secrets.SIGNING_PASS }}
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: maven-local
+          path: ~/.m2
+
+      - name: 'Publish to Sonatype'
+        run: ./gradlew publishToSonatype closeSonatypeStagingRepository | tee publishToSonatype.log
+        # bash has pipefail on by default, which is needed for tee to fail, if gradle fails
+        shell: bash
+        env:
+          ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.SONATYPE_USERNAME }}
+          ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.SONATYPE_PASSWORD }}
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          SIGNING_PASS: ${{ secrets.SIGNING_PASS }}
+
+      - name: 'Parse Sonatype repository'
+        id: sonatype
+        # publishToSonatype.log contains a line looking like this:
+        # Created staging repository 'comviliussutkus89-1055' at https://oss.sonatype.org/service/local/repositories/comviliussutkus89-1055/content/
+
+        # .(.+). should be '(.+)', to match 'comviliussutkus89-1055', but we already far too deep in qoutes for a simple \' to work.
+        run: perl -ne 'print "::set-output name=stagingRepo::$2\n::set-output name=stagingRepoUri::$3\n::warning ::$1\n" if /^(Created staging repository .(.+). at (.+))$/' < publishToSonatype.log
+
+      # @TODO: add enhancement issue id for nexus plugin to skip this manual step
+      - name: Sonatype manual publish reminder
+        run: echo "::warning ::Before pushing to Production you need to manually go to https://oss.sonatype.org/#stagingRepositories and release the staging repository named ${{ steps.sonatype.outputs.stagingRepo }}"
+
+      - name: Prepare sample app for staging repository
+        run: ./scripts/prepareSampleAppForStagingRepository sampleapp app --output=build/sampleapp-staging --repository=${{ steps.sonatype.outputs.stagingRepoUri }}
+
+      - name: Build sample app from staging library
+        run: ./gradlew build
+        working-directory: build/sampleapp-staging
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: sampleapp-staging
+          path: build/sampleapp-staging/app/build/outputs/apk/debug/app-debug.apk
+
+  staging:
+    needs: build
+    # Only macos VMs are available with exposed CPU extensions to run hardware accelerated emulator
+    runs-on: macos-10.15
+    strategy:
+      fail-fast: false
+      matrix:
+        api-level: [16, 21, 30]
+        arch: [x86, x86_64]
+        target: [default]
+        include:
+          - api-level: 30
+            arch: x86
+            target: google_apis
+          - api-level: 30
+            arch: x86_64
+            target: google_apis
+        exclude:
+          - api-level: 16
+            arch: x86_64
+          - api-level: 30
+            target: default
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-java@v2
+        with:
+          distribution: zulu
+          java-version: 8
+      - uses: android-actions/setup-android@v2
+
+      - name: Prepare AAR Instrumented Tests
+        run: scripts/prepareLibraryForStagingRepository lib --output=build/lib-staging --repository=${{ needs.build.outputs.STAGING_REPO_URI }}
+
+      - run: ./gradlew assemble
+        working-directory: build/lib-staging
+
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: ${{ matrix.arch }}
+          target: ${{ matrix.target }}
+          script: ./gradlew connectedCheck
+          working-directory: build/lib-staging
+
+  production:
+    environment: Production
+    needs: [build, staging]
+    permissions:
+      # Needed to make a version increment commit, maybe GitHub release too.
+      contents: write
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          # A branch is required for post release version increment commit
+          ref: ${{ github.event.ref }}
+
+      - run: ./scripts/incrementVersion --release --patch
+        id: version
+
+      - name: Verify that the repository is already released
+        run: |
+          wget "https://oss.sonatype.org/content/groups/public/com/viliussutkus89/samplelib/${{ steps.version.outputs.releasedVersion }}/samplelib-${{ steps.version.outputs.releasedVersion }}.aar"
+          test -f samplelib-${{ steps.version.outputs.releasedVersion }}.aar
+
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: "v${{ steps.version.outputs.releasedVersion }}"
+          name: "${{ github.event.repository.name }} v${{ steps.version.outputs.releasedVersion }}"
+
+      - name: Build sample app from released library
+        run: ./gradlew build
+        working-directory: sampleapp
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: maven-local
+          path: ~/.m2
+
+      - name: Attach files to GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: "v${{ steps.version.outputs.releasedVersion }}"
+          artifacts: "sampleapp/app/build/outputs/apk/debug/app-debug.apk,~/.m2/repository/**"
+
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "Post release version increment to ${{ steps.version.outputs.unreleasedVersion }} (from ${{ steps.version.outputs.releasedVersion }})"
+          file_pattern: ${{ steps.version.outputs.files }}
