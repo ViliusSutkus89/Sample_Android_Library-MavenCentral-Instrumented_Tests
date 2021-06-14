@@ -1,4 +1,4 @@
-name: onPush
+name: privilegedBuild
 on:
   push:
     branches: [ master, main ]

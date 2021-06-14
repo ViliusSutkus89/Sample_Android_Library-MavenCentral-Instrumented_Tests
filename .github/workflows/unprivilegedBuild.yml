@@ -1,4 +1,4 @@
-name: onPull
+name: unprivilegedBuild
 on:
   pull_request:
     paths-ignore: [ '**.md' ]
