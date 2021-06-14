@@ -67,8 +67,8 @@ afterEvaluate {
                     inceptionYear = '2021'
                     licenses {
                         license {
-                            name = 'The GNU General Public License, Version 3'
-                            url = 'https://www.gnu.org/licenses/gpl-3.0.txt'
+                            name = 'MIT License'
+                            url = 'https://opensource.org/licenses/MIT'
                             distribution = 'repo'
                         }
                     }
