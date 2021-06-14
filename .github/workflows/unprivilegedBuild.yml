@@ -1,7 +1,10 @@
 name: unprivilegedBuild
 on:
   pull_request:
-    paths-ignore: [ '**.md' ]
+    paths-ignore:
+      - '**.md'
+      - '.github/workflows/manualVersionIncrement*.yml'
+      - '.github/workflows/privilegedBuild.yml'
 
 permissions:
   actions: none
