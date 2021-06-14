@@ -32,10 +32,9 @@ Composed of three jobs:
    3) Deploys build artifacts to MavenLocal (~/.m2) for easier file access during GitHub release creation.
 2) Staging. Runs instrumented tests on a matrix of emulated Android devices against the library deployed to a staging repository in MavenCentral.
 3) Production.
-   1) Asserts that build artifact promotion to Release in MavenCentral already happened. Promotion step is done manually in oss.sonatype.org .
-   2) Increments library version in git repository.
-   3) Builds sample application against the newly released library.
-   4) Creates GitHub release and post release version increment commit.
+   1) Increments library version in git repository.
+   2) Builds sample application against the newly released library.
+   3) Creates GitHub release and post release version increment commit.
 
 #### [unprivilegedBuild.yml](.github/workflows/unprivilegedBuild.yml)
 1) Build. Compiles the library, deploys to mavenLocal (~/.m2), builds sample application.

@@ -140,11 +140,6 @@ jobs:
       - run: ./scripts/incrementVersion --release --patch
         id: version
 
-      - name: Verify that the repository is already released
-        run: |
-          wget "https://oss.sonatype.org/content/groups/public/com/viliussutkus89/samplelib/${{ steps.version.outputs.releasedVersion }}/samplelib-${{ steps.version.outputs.releasedVersion }}.aar"
-          test -f samplelib-${{ steps.version.outputs.releasedVersion }}.aar
-
       - name: Build sample app from released library
         run: ./gradlew build
         working-directory: sampleapp
