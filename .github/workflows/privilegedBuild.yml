@@ -145,13 +145,6 @@ jobs:
           wget "https://oss.sonatype.org/content/groups/public/com/viliussutkus89/samplelib/${{ steps.version.outputs.releasedVersion }}/samplelib-${{ steps.version.outputs.releasedVersion }}.aar"
           test -f samplelib-${{ steps.version.outputs.releasedVersion }}.aar
 
-      - name: Create GitHub Release
-        uses: ncipollo/release-action@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag: "v${{ steps.version.outputs.releasedVersion }}"
-          name: "${{ github.event.repository.name }} v${{ steps.version.outputs.releasedVersion }}"
-
       - name: Build sample app from released library
         run: ./gradlew build
         working-directory: sampleapp
@@ -161,11 +154,12 @@ jobs:
           name: maven-local
           path: ~/.m2
 
-      - name: Attach files to GitHub Release
+      - name: Create GitHub Release
         uses: ncipollo/release-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: "v${{ steps.version.outputs.releasedVersion }}"
+          name: "${{ github.event.repository.name }} v${{ steps.version.outputs.releasedVersion }}"
           artifacts: "sampleapp/app/build/outputs/apk/debug/app-debug.apk,~/.m2/repository/**"
 
       - uses: stefanzweifel/git-auto-commit-action@v4
