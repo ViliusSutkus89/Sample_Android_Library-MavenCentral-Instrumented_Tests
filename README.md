@@ -25,6 +25,7 @@ Build artifacts from Sample application are not signed yet.
 ## Workflows
 
 #### [privilegedBuild.yml](.github/workflows/privilegedBuild.yml)
+Triggered either manually (`workflow_dispatch`) or by push to master or main branch.
 Composed of three jobs:
 1) Build.
    1) Compiles the library, signs it with a private key. 
@@ -37,11 +38,13 @@ Composed of three jobs:
    3) Creates GitHub release and post release version increment commit.
 
 #### [unprivilegedBuild.yml](.github/workflows/unprivilegedBuild.yml)
+Triggered either manually (`workflow_dispatch`) or by pull request.
 1) Build. Compiles the library, deploys to mavenLocal (~/.m2), builds sample application.
 2) Staging. Runs instrumented tests on a matrix of emulated Android devices against the library deployed to a staging repository in MavenLocal (~/.m2).
 
 #### [manualVersionIncrement_{major,minor,patch}.yml](.github/workflows/manualVersionIncrement_major.yml)
-Manually triggered workflows (`workflow_dispatch`), used to increment project version and commit changes to source control.
+Triggered manually (`workflow_dispatch`).  
+Used to increment project version and commit changes to source control.
 
 ## Environments
 #### BuildWithDeployToSonatype
