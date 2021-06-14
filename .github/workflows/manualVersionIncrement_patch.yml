@@ -19,9 +19,6 @@ jobs:
       - run: ./scripts/incrementVersion --patch
         id: version
 
-      - run: git status
-      - run: git diff
-
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "Increment version to ${{ steps.version.outputs.unreleasedVersion }} (from ${{ steps.version.outputs.releasedVersion }})"
