@@ -61,8 +61,8 @@ afterEvaluate {
 
                 pom {
                     name = rootProject.name
-                    description = 'Sample_Android_Library-Sonatype_Published-Instrumented_Tests_In_Android_Emulator'
-                    url = 'https://github.com/ViliusSutkus89/Sample_Android_Library-Sonatype_Published-Instrumented_Tests_In_Android_Emulator'
+                    description = 'Sample_Android_Library-MavenCentral-Instrumented_Tests'
+                    url = 'https://github.com/ViliusSutkus89/Sample_Android_Library-MavenCentral-Instrumented_Tests'
                     packaging = 'aar'
                     inceptionYear = '2021'
                     licenses {
@@ -80,8 +80,8 @@ afterEvaluate {
                         }
                     }
                     scm {
-                        url = 'https://github.com/ViliusSutkus89/Sample_Android_Library-Sonatype_Published-Instrumented_Tests_In_Android_Emulator'
-                        connection = 'https://github.com/ViliusSutkus89/Sample_Android_Library-Sonatype_Published-Instrumented_Tests_In_Android_Emulator.git'
+                        url = 'https://github.com/ViliusSutkus89/Sample_Android_Library-MavenCentral-Instrumented_Tests'
+                        connection = 'https://github.com/ViliusSutkus89/Sample_Android_Library-MavenCentral-Instrumented_Tests.git'
                     }
                 }
             }
