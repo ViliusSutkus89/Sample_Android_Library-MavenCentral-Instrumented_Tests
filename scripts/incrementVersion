@@ -85,8 +85,8 @@ print "::set-output name=releasedVersionCode::$oldVersionCode\n";
 print "::set-output name=unreleasedVersion::$newVersion\n";
 print "::set-output name=unreleasedVersionCode::$newVersionCode\n";
 
-print '::set-output name=files::\'build.gradle lib/build.gradle';
+print '::set-output name=files::build.gradle lib/build.gradle';
 if (defined $isRelease) {
     print ' sampleapp/app/build.gradle';
 }
-print "'\n";
+print "\n";
