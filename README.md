@@ -10,7 +10,6 @@ Instrumented tests are run against the previously deployed library on a matrix o
 Build, which passes instrumented tests, can be promoted to production.  
 Build promotion to production creates a new GitHub release.  
 Currently, build in MavenCentral needs to be manually promoted from staging to production.
-A step in Production job verifies that this is done before proceeding with the release.
 
 ## Drawbacks
 
