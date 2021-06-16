@@ -1,0 +1,68 @@
+#!/usr/bin/env perl
+###########################################################################################
+### The Purpose ### The Purpose ### The Purpose ### The Purpose ### The Purpose ### The ###
+###########################################################################################
+# The purpose of this script is to check if given URL is reachable.
+# Used to verify that a released version is actually in the MavenCentral.
+# Configurable timeout and retry count allows waiting until the version becomes available.
+###########################################################################################
+### ~The Purpose~ # ~The Purpose~ # ~The Purpose~ # ~The Purpose~ # ~The Purpose~ # ~The~ #
+###########################################################################################
+use strict;
+use warnings;
+
+use File::Basename;
+use Getopt::Long;
+use HTTP::Tiny;
+use lib File::Basename::dirname(__FILE__);
+use getVersion;
+
+sub usage {
+    print STDERR './', File::Basename::basename(__FILE__), " [--retries=10] [--timeout=60] https://repo1.maven.org/maven2/com/viliussutkus89/samplelib/{VERSION_TOKEN}/samplelib-{VERSION_TOKEN}.aar\n";
+    print STDERR "\tOptional: retries is the amount of times to check again, if check failed. Defaults to 10.\n";
+    print STDERR "\tOptional: timeout is the time in seconds between retries. Defaults to 60.\n";
+    print STDERR "\nMandatory: URL of released library to be checked for. {VERSION_TOKEN} will be substituted with the current version by this script.\n";
+    exit 1;
+}
+
+my $retries = 10;
+my $timeout = 60;
+my ($url, $version, $help);
+Getopt::Long::GetOptions('retries=s' => \$retries, 'timeout=s' => \$timeout, 'help' => \$help);
+if (defined $help) {
+    usage();
+}
+
+$url = shift @ARGV or do {
+    print STDERR "Missing mandatory argument: URL of released library!\n";
+    usage();
+};
+
+$version = getVersion::getVersion();
+$url =~ s/{VERSION_TOKEN}/$version/g;
+
+my $http = HTTP::Tiny->new();
+
+print "Checking $url\n";
+STDOUT->autoflush(1);
+while (1) {
+    my $response = $http->get($url);
+    if ($response->{success}) {
+        print "Success\n";
+        last;
+    }
+    print 'Received HTTP Status Code: ', $response->{status}, "\n";
+    if ($retries-- > 0) {
+        print 'Retrying in ', $timeout, " seconds\n";
+        if ($timeout > 0) {
+            for (1 .. $timeout) {
+                print '.';
+                sleep(1);
+            }
+            print "\n";
+        }
+    } else {
+        print STDERR "Requested URI $url is not available. Erroring out!\n";
+        exit 1;
+    }
+}
