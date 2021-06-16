@@ -142,6 +142,12 @@ jobs:
           sonatypeUsername: ${{ secrets.SONATYPE_USERNAME }}
           sonatypePassword: ${{ secrets.SONATYPE_PASSWORD }}
 
+      - uses: actions/setup-java@v2
+        with:
+          distribution: zulu
+          java-version: 8
+      - uses: android-actions/setup-android@v2
+
       - run: ./scripts/checkIfVersionReleased https://repo1.maven.org/maven2/com/viliussutkus89/samplelib/{VERSION_TOKEN}/samplelib-{VERSION_TOKEN}.aar --retries=10 --timeout=60
 
       - run: ./scripts/incrementVersion --release --patch
