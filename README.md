@@ -21,47 +21,54 @@ Build artifacts from Sample application are not signed yet.
 ## Workflows
 
 #### [privilegedBuild.yml](.github/workflows/privilegedBuild.yml)
-Triggered either manually (`workflow_dispatch`) or by push to master or main branch.
-Composed of three jobs:
-1) Build.
+Triggered either by push to master or main branch or manually (`workflow_dispatch`).
+Composed of four jobs:
+1) build:
    1) Compiles the library, signs it with a private key. 
-   2) Deploys build artifacts to a staging repository in MavenCentral.
-   3) Deploys build artifacts to MavenLocal (~/.m2) for easier file access during GitHub release creation.
-2) Staging. Runs instrumented tests on a matrix of emulated Android devices against the library deployed to a staging repository in MavenCentral.
-3) Production.
-   1) Promotes the staging repository to MavenCentral.
+   1) Deploys build artifacts to a staging repository in MavenCentral.
+   1) Deploys build artifacts to MavenLocal (~/.m2) for easier file access during GitHub release creation.
+1) staging:
+   1) Prepares instrumented tests to be executed against library in the staging repository.
+   1) Runs instrumented tests on a matrix of emulated Android devices.
+1) releaseSonatype: Promotes the staging repository to MavenCentral.
+1) releaseGitHub:
    1) Increments library version in git repository.
    1) Builds sample application against the newly released library.
    1) Creates GitHub release and post release version increment commit.
 
 #### [unprivilegedBuild.yml](.github/workflows/unprivilegedBuild.yml)
-Triggered either manually (`workflow_dispatch`) or by pull request.
+Triggered either by pull request or manually (`workflow_dispatch`).
 1) Build. Compiles the library, deploys to mavenLocal (~/.m2), builds sample application.
 2) Staging. Runs instrumented tests on a matrix of emulated Android devices against the library deployed to a staging repository in MavenLocal (~/.m2).
 
 #### [manualVersionIncrement_{major,minor,patch}.yml](.github/workflows/manualVersionIncrement_major.yml)
-Triggered manually (`workflow_dispatch`).  
+Triggered only manually (`workflow_dispatch`).  
 Used to increment project version and commit changes to source control.
 
 ## Environments
-#### BuildWithDeployToSonatype
-Used by the build job in the privilegedBuild workflow.  
+#### BuildWithDeployToSonatype - (privilegedBuild workflow)
+Used by the build job.  
 Environment contains the following secrets:  
 `SIGNING_KEY`, `SIGNING_PASS` - ASCII armored private key and password.  
 `SONATYPE_USERNAME`, `SONATYPE_PASSWORD` - User token (not the actual login to oss.sonatype.org), obtained through oss.sonatype.org -> Profile -> User Token.
 
-#### Staging
-Used by the staging job in the privilegedBuild workflow.  
+#### Staging - (privilegedBuild workflow)
+Used by the staging job, which depends on build job.  
 Has no need to be an actual environment, because it contains no secrets and no protection rules.  
 Is an environment just for clarity.
 
-#### Production
-Used by the production job in the privilegedBuild workflow.  
-Has manual review protection rule, which is used to manually gate builds between Staging and Production.
+#### ReleaseSonatype - (privilegedBuild workflow)
+Used by the releaseSonatype job, which depends on staging job.  
+Has manual review protection rule, which is used to gate builds.  
 Environment contains the following secrets:   
 `SONATYPE_USERNAME`, `SONATYPE_PASSWORD` - User token (not the actual login to oss.sonatype.org), obtained through oss.sonatype.org -> Profile -> User Token.
 
-#### BuildUnprivileged
+#### ReleaseGitHub - (privilegedBuild workflow)
+Used by the releaseGitHub job, which depends on releaseSonatype job.
+Has a timed gate, to ensure Sonatype release propagation to MavenCentral.
+Environment contains no secrets.
+
+#### BuildUnprivileged - (unprivilegedBuild workflow)
 Used by the build and staging jobs in the unprivilegedBuild workflow.
 Has no need to be an actual environment, because it contains no secrets and no protection rules.  
 Is an environment just for clarity.

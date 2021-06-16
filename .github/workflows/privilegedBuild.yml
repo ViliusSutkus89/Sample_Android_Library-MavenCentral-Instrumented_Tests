@@ -124,9 +124,21 @@ jobs:
           script: ./gradlew connectedCheck
           working-directory: build/lib-staging
 
-  production:
-    environment: Production
-    needs: [build, staging]
+  releaseSonatype:
+    environment: ReleaseSonatype
+    needs: staging
+    runs-on: ubuntu-20.04
+      steps:
+        - uses: actions/checkout@v2
+
+        - run: ./scripts/promoteStagingRepository ${{ needs.build.outputs.STAGING_REPO }} --nexusUrl=https://oss.sonatype.org/service/local/
+          env:
+            sonatypeUsername: ${{ secrets.SONATYPE_USERNAME }}
+            sonatypePassword: ${{ secrets.SONATYPE_PASSWORD }}
+
+  releaseGitHub:
+    environment: ReleaseGitHub
+    needs: releaseSonatype
     permissions:
       # Needed to make a version increment commit, maybe GitHub release too.
       contents: write
@@ -136,11 +148,6 @@ jobs:
         with:
           # A branch is required for post release version increment commit
           ref: ${{ github.event.ref }}
-
-      - run: ./scripts/promoteStagingRepository ${{ needs.build.outputs.STAGING_REPO }} --nexusUrl=https://oss.sonatype.org/service/local/
-        env:
-          sonatypeUsername: ${{ secrets.SONATYPE_USERNAME }}
-          sonatypePassword: ${{ secrets.SONATYPE_PASSWORD }}
 
       - uses: actions/setup-java@v2
         with:
