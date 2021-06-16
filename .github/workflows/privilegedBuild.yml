@@ -126,7 +126,8 @@ jobs:
 
   releaseSonatype:
     environment: ReleaseSonatype
-    needs: staging
+    # Needs to depend on build, to obtain STAGING_REPO
+    needs: [build, staging]
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
