@@ -12,7 +12,7 @@
 use warnings;
 use strict;
 
-use File::Basename 'dirname';
+use File::Basename;
 use Getopt::Long;
 use lib dirname(__FILE__);
 use fileUpdater;
