@@ -128,13 +128,12 @@ jobs:
     environment: ReleaseSonatype
     needs: staging
     runs-on: ubuntu-20.04
-      steps:
-        - uses: actions/checkout@v2
-
-        - run: ./scripts/promoteStagingRepository ${{ needs.build.outputs.STAGING_REPO }} --nexusUrl=https://oss.sonatype.org/service/local/
-          env:
-            sonatypeUsername: ${{ secrets.SONATYPE_USERNAME }}
-            sonatypePassword: ${{ secrets.SONATYPE_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v2
+      - run: ./scripts/promoteStagingRepository ${{ needs.build.outputs.STAGING_REPO }} --nexusUrl=https://oss.sonatype.org/service/local/
+        env:
+          sonatypeUsername: ${{ secrets.SONATYPE_USERNAME }}
+          sonatypePassword: ${{ secrets.SONATYPE_PASSWORD }}
 
   releaseGitHub:
     environment: ReleaseGitHub
