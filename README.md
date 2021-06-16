@@ -8,16 +8,13 @@ Library is built on GitHub Actions pipeline.
 Each successful build is deployed to a new staging repository in MavenCentral (Additional keywords: OSSRH, Nexus, Sonatype).  
 Instrumented tests are run against the previously deployed library on a matrix of emulated devices, also in the GitHub Actions pipeline.  
 Build, which passes instrumented tests, can be promoted to production.  
-Build promotion to production creates a new GitHub release.  
-Currently, build in MavenCentral needs to be manually promoted from staging to production.
+Build promotion to production creates a new GitHub release.
 
 ## Drawbacks
 
 No build badge - badge status updates only when the whole workflow finishes. Either failed or succeeded.  
 Current implementation has only two types of finished workflows: failed builds and released build.  
 This means that after a build break, the badge will stay red until a new release, not until a passing build.
-
-Before a build can be promoted to Production environment in GitHub, the same build needs to be manually promoted in MavenCentral.
 
 Build artifacts from Sample application are not signed yet.
 
@@ -32,9 +29,10 @@ Composed of three jobs:
    3) Deploys build artifacts to MavenLocal (~/.m2) for easier file access during GitHub release creation.
 2) Staging. Runs instrumented tests on a matrix of emulated Android devices against the library deployed to a staging repository in MavenCentral.
 3) Production.
+   1) Promotes the staging repository to MavenCentral.
    1) Increments library version in git repository.
-   2) Builds sample application against the newly released library.
-   3) Creates GitHub release and post release version increment commit.
+   1) Builds sample application against the newly released library.
+   1) Creates GitHub release and post release version increment commit.
 
 #### [unprivilegedBuild.yml](.github/workflows/unprivilegedBuild.yml)
 Triggered either manually (`workflow_dispatch`) or by pull request.
@@ -59,8 +57,9 @@ Is an environment just for clarity.
 
 #### Production
 Used by the production job in the privilegedBuild workflow.  
-Has manual review protection rule, which is used to manually gate builds between Staging and Production. 
-Contains no secrets.
+Has manual review protection rule, which is used to manually gate builds between Staging and Production.
+Environment contains the following secrets:   
+`SONATYPE_USERNAME`, `SONATYPE_PASSWORD` - User token (not the actual login to oss.sonatype.org), obtained through oss.sonatype.org -> Profile -> User Token.
 
 #### BuildUnprivileged
 Used by the build and staging jobs in the unprivilegedBuild workflow.
@@ -99,3 +98,6 @@ On release, production environment builds the sample application again, which do
 #### [checkIfVersionReleased](scripts/checkIfVersionReleased)
 Checks if given URL is reachable. Used to verify that a released version is actually in the MavenCentral.  
 Configurable timeout and retry count allows waiting until the version becomes available.
+
+#### [promoteStagingRepository](scripts/promoteStagingRepository)
+Promotes a given staging repository to MavenCentral.

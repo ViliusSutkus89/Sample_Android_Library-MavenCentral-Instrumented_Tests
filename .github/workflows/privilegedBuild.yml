@@ -66,10 +66,6 @@ jobs:
         # .(.+). should be '(.+)', to match 'comviliussutkus89-1055', but we already far too deep in qoutes for a simple \' to work.
         run: perl -ne 'print "::set-output name=stagingRepo::$2\n::set-output name=stagingRepoUri::$3\n::warning ::$1\n" if /^(Created staging repository .(.+). at (.+))$/' < publishToSonatype.log
 
-      # @TODO: add enhancement issue id for nexus plugin to skip this manual step
-      - name: Sonatype manual publish reminder
-        run: echo "::warning ::Before pushing to Production you need to manually go to https://oss.sonatype.org/#stagingRepositories and release the staging repository named ${{ steps.sonatype.outputs.stagingRepo }}"
-
       - name: Prepare sample app for staging repository
         run: ./scripts/prepareSampleAppForStagingRepository sampleapp app --output=build/sampleapp-staging --repository=${{ steps.sonatype.outputs.stagingRepoUri }}
 
@@ -140,6 +136,11 @@ jobs:
         with:
           # A branch is required for post release version increment commit
           ref: ${{ github.event.ref }}
+
+      - run: ./scripts/promoteStagingRepository ${{ needs.build.outputs.STAGING_REPO }} --nexusUrl=https://oss.sonatype.org/service/local/
+        env:
+          sonatypeUsername: ${{ secrets.SONATYPE_USERNAME }}
+          sonatypePassword: ${{ secrets.SONATYPE_PASSWORD }}
 
       - run: ./scripts/checkIfVersionReleased https://repo1.maven.org/maven2/com/viliussutkus89/samplelib/{VERSION_TOKEN}/samplelib-{VERSION_TOKEN}.aar --retries=10 --timeout=60
 
