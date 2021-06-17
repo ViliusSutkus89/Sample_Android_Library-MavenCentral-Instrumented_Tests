@@ -43,10 +43,12 @@ jobs:
           SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
           SIGNING_PASS: ${{ secrets.SIGNING_PASS }}
 
+      - run: tar -cvf maven-local.tar ~/.m2
+
       - uses: actions/upload-artifact@v2
         with:
           name: maven-local
-          path: ~/.m2
+          path: maven-local.tar
 
       - name: 'Publish to Sonatype'
         run: ./gradlew publishToSonatype closeSonatypeStagingRepository | tee publishToSonatype.log
@@ -173,7 +175,7 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: maven-local
-          path: ~/.m2
+          path: maven-local.tar
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
@@ -181,7 +183,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: "v${{ steps.version.outputs.releasedVersion }}"
           name: "${{ github.event.repository.name }} v${{ steps.version.outputs.releasedVersion }}"
-          artifacts: "sampleapp/app/build/outputs/apk/debug/app-debug.apk,~/.m2/repository/**"
+          artifacts: "sampleapp/app/build/outputs/apk/debug/app-debug.apk,maven-local.tar"
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
