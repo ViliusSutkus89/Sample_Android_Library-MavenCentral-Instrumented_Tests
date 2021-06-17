@@ -184,8 +184,15 @@ jobs:
           tag: "v${{ steps.version.outputs.releasedVersion }}"
           name: "${{ github.event.repository.name }} v${{ steps.version.outputs.releasedVersion }}"
           artifacts: "sampleapp/app/build/outputs/apk/debug/app-debug.apk,maven-local.tar"
+          bodyFile: "UpcomingReleaseNotes.md"
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "Post release version increment to ${{ steps.version.outputs.unreleasedVersion }} (from ${{ steps.version.outputs.releasedVersion }})"
           file_pattern: ${{ steps.version.outputs.files }}
+
+      - run: echo -n > UpcomingReleaseNotes.md
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "Post release truncation of UpcomingReleaseNotes.md"
+          file_pattern: UpcomingReleaseNotes.md
