@@ -1,1 +1,0 @@
-- Attach .m2 folder as maven-local.tar instead of separate files
