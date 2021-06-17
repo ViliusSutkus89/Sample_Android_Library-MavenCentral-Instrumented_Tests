@@ -3,7 +3,7 @@
 ### The Purpose ### The Purpose ### The Purpose ### The Purpose ### The Purpose ### The ###
 ###########################################################################################
 # The purpose of this script is to check if given URL is reachable.
-# Used to verify that a released version is actually in the MavenCentral.
+# Used to verify that a released version is actually available in MavenCentral.
 # Configurable timeout and retry count allows waiting until the version becomes available.
 ###########################################################################################
 ### ~The Purpose~ # ~The Purpose~ # ~The Purpose~ # ~The Purpose~ # ~The Purpose~ # ~The~ #
@@ -21,7 +21,7 @@ sub usage {
     print STDERR './', File::Basename::basename(__FILE__), " [--retries=10] [--timeout=60] https://repo1.maven.org/maven2/com/viliussutkus89/samplelib/{VERSION_TOKEN}/samplelib-{VERSION_TOKEN}.aar [additionalURLs]\n";
     print STDERR "\tOptional: retries is the amount of times to check again, if check failed. Defaults to 10.\n";
     print STDERR "\tOptional: timeout is the time in seconds between retries. Defaults to 60.\n";
-    print STDERR "\nMandatory: one or more URL of released library to be checked for. {VERSION_TOKEN} will be substituted with the current version by this script.\n";
+    print STDERR "\nMandatory: one or more URLs of released library to be checked for. {VERSION_TOKEN} will be substituted with the current version by this script.\n";
     exit 1;
 }
 
