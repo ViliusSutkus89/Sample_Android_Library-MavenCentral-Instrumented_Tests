@@ -38,18 +38,6 @@ jobs:
 
       - run: ./gradlew assembleRelease
 
-      - run: ./gradlew publishToMavenLocal
-        env:
-          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
-          SIGNING_PASS: ${{ secrets.SIGNING_PASS }}
-
-      - run: tar -cvf maven-local.tar ~/.m2
-
-      - uses: actions/upload-artifact@v2
-        with:
-          name: maven-local
-          path: maven-local.tar
-
       - name: 'Publish to Sonatype'
         run: ./gradlew publishToSonatype closeSonatypeStagingRepository | tee publishToSonatype.log
         # bash has pipefail on by default, which is needed for tee to fail, if gradle fails
@@ -79,6 +67,18 @@ jobs:
         with:
           name: sampleapp-staging
           path: build/sampleapp-staging/app/build/outputs/apk/debug/app-debug.apk
+
+      - run: ./gradlew publishToMavenLocal
+        env:
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          SIGNING_PASS: ${{ secrets.SIGNING_PASS }}
+
+      - run: tar -cvf maven-local.tar ~/.m2
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: maven-local
+          path: maven-local.tar
 
   staging:
     environment: Staging
