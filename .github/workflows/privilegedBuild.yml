@@ -80,6 +80,29 @@ jobs:
           name: maven-local
           path: maven-local.tar
 
+      #@TODO: move this to releaseGitHub
+      - name: Decode
+        id: decodeKeystore
+        run: |
+          echo ${{ env.APP_SIGNING_KEYFILE_BASE64 }} | base64 --decode - > ~/SampleApplication.jks
+          echo "::set-output name=APP_SIGNING_KEYFILE::~/SampleApplication.jks";
+        env:
+          - APP_SIGNING_KEYFILE_BASE64: ${{ secrets.APP_SIGNING_KEYFILE_BASE64 }}
+
+      - name: Build sample app from staging library
+        run: ./gradlew build
+        working-directory: build/sampleapp-staging
+        env:
+          APP_SIGNING_KEYFILE: ${{ steps.decodeKeystore.outputs.APP_SIGNING_KEYFILE }}
+          APP_SIGNING_PASS: ${{ secrets.APP_SIGNING_PASS }}
+          APP_SIGNING_ALIAS: ${{ secrets.APP_SIGNING_ALIAS }}
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: sampleapp-staging
+          path: build/sampleapp-staging/app/build/outputs/apk/release/app-release.apk
+      #@TODO: move this to releaseGitHub
+
   staging:
     environment: Staging
     needs: build

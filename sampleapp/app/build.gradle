@@ -10,10 +10,21 @@ android {
         versionCode 10
         versionName '1.0.9'
     }
+    signingConfigs {
+        release {
+            storeFile file(System.getenv('APP_SIGNING_KEYFILE'))
+            storePassword System.getenv('APP_SIGNING_PASS')
+            keyAlias System.getenv('APP_SIGNING_ALIAS')
+            keyPassword System.getenv('APP_SIGNING_PASS')
+        }
+    }
     buildTypes {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            if (System.getenv('APP_SIGNING_KEYFILE') && System.getenv('APP_SIGNING_ALIAS') && System.getenv('APP_SIGNING_PASS')) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 
