@@ -11,13 +11,19 @@ android {
         minSdkVersion 16
         targetSdkVersion 30
 
-        versionCode 12
+        versionCode 22
         versionName rootProject.version
 
         archivesBaseName = rootProject.name
 
         consumerProguardFiles 'proguard-rules.pro'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        // Following Config Fields used in VersionGetter,
+        // Not important for the library template
+        buildConfigField("long", "VERSION_CODE", "${defaultConfig.versionCode}")
+        buildConfigField("String", "VERSION_NAME", "\"${defaultConfig.versionName}\"")
+        buildConfigField("String", "APP_GIT_COMMMIT", "\"${System.env.APP_GIT_COMMMIT}\"")
     }
 }
 
