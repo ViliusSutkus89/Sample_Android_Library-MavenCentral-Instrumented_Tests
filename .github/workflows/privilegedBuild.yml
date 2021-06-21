@@ -171,8 +171,8 @@ jobs:
       - name: Decode keystore used for Sample app signing
         id: decodeKeystore
         run: |
-          echo "${{ env.APP_SIGNING_KEYFILE_BASE64 }}" | base64 --decode - > "$HOME/SampleApplication.jks"
-          echo "::set-output name=APP_SIGNING_KEYFILE::$HOME/SampleApplication.jks"
+          echo "${{ env.APP_SIGNING_KEYFILE_BASE64 }}" | base64 --decode - > "$HOME/com.viliussutkus89.samplelib.sampleapp.jks"
+          echo "::set-output name=APP_SIGNING_KEYFILE::$HOME/com.viliussutkus89.samplelib.sampleapp.jks"
         env:
           APP_SIGNING_KEYFILE_BASE64: ${{ secrets.APP_SIGNING_KEYFILE_BASE64 }}
 
