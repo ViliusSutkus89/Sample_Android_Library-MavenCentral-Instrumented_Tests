@@ -1,1 +1,0 @@
-Show app and lib version in sample app.
