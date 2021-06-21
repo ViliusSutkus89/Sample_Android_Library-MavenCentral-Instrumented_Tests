@@ -10,7 +10,7 @@ Library is built on GitHub Actions pipeline.
 Each successful build is deployed to a new staging repository in MavenCentral (Additional keywords: OSSRH, Nexus, Sonatype).  
 Instrumented tests are run against the previously deployed library on a matrix of emulated devices, also in the GitHub Actions pipeline.  
 Build, which passes instrumented tests, can be promoted to production.  
-Build promotion to production creates a new GitHub release.
+Promotion to production means promoting the build to MavenCentral and creating a new GitHub release.
 
 ## Drawbacks
 
@@ -223,7 +223,7 @@ Encode it as base64 and save it as a secret named `APP_SIGNING_KEYFILE_BASE64` i
 $ base64 com.viliussutkus89.samplelib.sampleapp.jks
 ... [redacted] ...
 ```
-Also include `APP_SIGNING_PASS` and `APP_SIGNING_ALIAS` (my-alias in the example) in the same environment.
+Also include `APP_SIGNING_PASS` and `APP_SIGNING_ALIAS` ("my-alias" in the example) in the same environment.
 
 ## CI/CD scripts
 
