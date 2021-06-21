@@ -254,3 +254,9 @@ Configurable timeout and retry count allows waiting until the version becomes av
 
 #### [promoteStagingRepository](scripts/promoteStagingRepository)
 Promotes a given staging repository to MavenCentral.
+
+## MavenCentral
+
+Publishing to MavenCentral requires setting up an account with Sonatype.  
+Follow the [Getting started guide](https://central.sonatype.org/publish/publish-guide/).  
+[Publish-plugin](https://github.com/gradle-nexus/publish-plugin) is a required read to figure out how to set Sonatype host to s01.oss.sonatype.org.
