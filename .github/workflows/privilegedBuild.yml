@@ -87,7 +87,7 @@ jobs:
           echo ${{ env.APP_SIGNING_KEYFILE_BASE64 }} | base64 --decode - > ~/SampleApplication.jks
           echo "::set-output name=APP_SIGNING_KEYFILE::~/SampleApplication.jks";
         env:
-          - APP_SIGNING_KEYFILE_BASE64: ${{ secrets.APP_SIGNING_KEYFILE_BASE64 }}
+          APP_SIGNING_KEYFILE_BASE64: ${{ secrets.APP_SIGNING_KEYFILE_BASE64 }}
 
       - name: Build sample app from staging library
         run: ./gradlew build
