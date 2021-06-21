@@ -82,6 +82,6 @@ $sampleAppStaging->update($appProjectName, undef, sub {
 $sampleAppStaging->update("$appProjectName/build.gradle", sub {
     $_ = shift;
     s/(versionName\s+["']).+(["'])/${1}${appVersion}${2}/;
-    s/(implementation\s+["']com\.viliussutkus89:tmpfile-android:).+(["'])/${1}${version}${2}/;
+    s/(implementation\s+["']com\.viliussutkus89:samplelib:).+(["'])/${1}${version}${2}/;
     return $_;
 });
