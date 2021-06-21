@@ -1,6 +1,8 @@
 # Sample Android library
 The purpose of this project is to provide a sample library with a particular set of CI/CD features.
 
+[![Maven Central](https://img.shields.io/maven-central/v/com.viliussutkus89/samplelib.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:com.viliussutkus89%20AND%20a:samplelib)
+
 ## Features
 
 Project contains an Android [library](lib) with [instrumented tests](lib/src/androidTest/java/com/viliussutkus89/samplelib/ExampleInstrumentedTest.java) and a [sample application](sampleapp).  
