@@ -1,0 +1,2 @@
+- Sign sample application with a release key.
+- Properly attach maven-local.tar to GitHub Release.
