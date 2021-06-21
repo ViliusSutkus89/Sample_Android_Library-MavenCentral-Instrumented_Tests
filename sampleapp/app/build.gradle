@@ -12,7 +12,7 @@ android {
     }
     signingConfigs {
         release {
-            storeFile file(System.getenv('APP_SIGNING_KEYFILE'))
+            storeFile file(System.getenv('APP_SIGNING_KEYFILE') ? System.getenv('APP_SIGNING_KEYFILE')  : '/dev/null')
             storePassword System.getenv('APP_SIGNING_PASS')
             keyAlias System.getenv('APP_SIGNING_ALIAS')
             keyPassword System.getenv('APP_SIGNING_PASS')
