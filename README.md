@@ -7,7 +7,8 @@ The purpose of this project is to provide a sample library with a particular set
 
 Project contains an Android [library](lib) with [instrumented tests](lib/src/androidTest/java/com/viliussutkus89/samplelib/ExampleInstrumentedTest.java) and a [sample application](sampleapp).  
 Library is built on GitHub Actions pipeline.  
-Each successful build is deployed to a new staging repository in MavenCentral (Additional keywords: OSSRH, Nexus, Sonatype).  
+Each successful build is published to a new staging repository in MavenCentral (Additional keywords: OSSRH, Nexus, Sonatype).
+Publishing is done using [publish-plugin](https://github.com/gradle-nexus/publish-plugin).  
 Instrumented tests are run against the previously deployed library on a matrix of emulated devices, also in the GitHub Actions pipeline.  
 Build, which passes instrumented tests, can be promoted to production.  
 Promotion to production means promoting the build to MavenCentral and creating a new GitHub release.
