@@ -16,7 +16,7 @@ public class MainActivity extends AppCompatActivity {
     appVersion.setText("Code=" + BuildConfig.VERSION_CODE + ", name=" + BuildConfig.VERSION_NAME);
 
     TextView appGitCommit = findViewById(R.id.appGitCommit);
-    appGitCommit.setText(R.string.APP_GIT_COMMMIT);
+    appGitCommit.setText(R.string.GIT_COMMMIT);
 
     TextView libVersion = findViewById(R.id.libVersion);
     libVersion.setText(VersionGetter.getVersion());

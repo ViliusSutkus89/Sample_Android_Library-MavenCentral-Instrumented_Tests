@@ -10,7 +10,7 @@ android {
         versionCode 22
         versionName '1.1.0'
 
-        resValue("string", "APP_GIT_COMMMIT", "${System.env.APP_GIT_COMMMIT}")
+        resValue("string", "GIT_COMMMIT", "${System.env.GITHUB_SHA}")
     }
     signingConfigs {
         release {

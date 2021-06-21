@@ -6,6 +6,6 @@ public class VersionGetter {
     }
 
     public static String getGitCommit() {
-        return BuildConfig.APP_GIT_COMMMIT;
+        return BuildConfig.GIT_COMMMIT;
     }
 }
