@@ -18,8 +18,6 @@ No build badge - badge status updates only when the whole workflow finishes. Eit
 Current implementation has only two types of finished workflows: failed builds and released build.  
 This means that after a build break, the badge will stay red until a new release, not until a passing build.
 
-Build artifacts from Sample application are not signed yet.
-
 ## Workflows
 
 #### [privilegedBuild.yml](.github/workflows/privilegedBuild.yml)
@@ -68,7 +66,8 @@ Environment contains the following secrets:
 #### ReleaseGitHub - (privilegedBuild workflow)
 Used by the releaseGitHub job, which depends on releaseSonatype job.
 Has a timed gate, to ensure Sonatype release propagation to MavenCentral.
-Environment contains no secrets.
+Environment contains the following secrets:
+`APP_SIGNING_KEYFILE_BASE64`, `APP_SIGNING_PASS`, `APP_SIGNING_ALIAS` - keystore used for sample application signing.
 
 #### BuildUnprivileged - (unprivilegedBuild workflow)
 Used by the build and staging jobs in the unprivilegedBuild workflow.
@@ -191,6 +190,40 @@ I3hjat7P/Un2nadi/uBSum1tGaOcnlR4w+ePYKAIREQ=
 =vf/G
 -----END PGP PUBLIC KEY BLOCK-----
 ```
+
+#### Signed sample application
+Gradle needs a keystore to sign the application. Keystore is generated using keytool. JRE includes keytool binary.  
+Validity needs to be long, because unlike GPG keys, keystore validity cannot be extended.
+```shell
+$ keytool -genkey -v -keystore com.viliussutkus89.samplelib.sampleapp.jks -keyalg RSA -keysize 4096 -validity 10000 -alias my-alias
+Enter keystore password:  
+Re-enter new password: 
+What is your first and last name?
+  [Unknown]:  com.viliussutkus89.samplelib.sampleapp                        
+What is the name of your organizational unit?
+  [Unknown]:  Android apps
+What is the name of your organization?
+  [Unknown]:  ViliusSutkus89.com
+What is the name of your City or Locality?
+  [Unknown]:  Kaunas
+What is the name of your State or Province?
+  [Unknown]:  Kaunas
+What is the two-letter country code for this unit?
+  [Unknown]:  LT
+Is CN=com.viliussutkus89.samplelib.sampleapp, OU=Android apps, O=ViliusSutkus89.com, L=Kaunas, ST=Kaunas, C=LT correct?
+  [no]:  yes
+
+Generating 4,096 bit RSA key pair and self-signed certificate (SHA384withRSA) with a validity of 10,000 days
+	for: CN=com.viliussutkus89.samplelib.sampleapp, OU=Android apps, O=ViliusSutkus89.com, L=Kaunas, ST=Kaunas, C=LT
+[Storing com.viliussutkus89.samplelib.sampleapp.jks]
+```
+Even though the keystore file is password protected, there is no need to commit it to git.  
+Encode it as base64 and save it as a secret named `APP_SIGNING_KEYFILE_BASE64` in the environment ReleaseGitHub.  
+```shell
+$ base64 com.viliussutkus89.samplelib.sampleapp.jks
+... [redacted] ...
+```
+Also include `APP_SIGNING_PASS` and `APP_SIGNING_ALIAS` (my-alias in the example) in the same environment.
 
 ## CI/CD scripts
 

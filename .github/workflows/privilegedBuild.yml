@@ -80,29 +80,6 @@ jobs:
           name: maven-local
           path: maven-local.tar
 
-      #@TODO: move this to releaseGitHub
-      - name: Decode
-        id: decodeKeystore
-        run: |
-          echo ${{ env.APP_SIGNING_KEYFILE_BASE64 }} | base64 --decode - > ~/SampleApplication.jks
-          echo "::set-output name=APP_SIGNING_KEYFILE::~/SampleApplication.jks";
-        env:
-          APP_SIGNING_KEYFILE_BASE64: ${{ secrets.APP_SIGNING_KEYFILE_BASE64 }}
-
-      - name: Build sample app from staging library
-        run: ./gradlew build
-        working-directory: build/sampleapp-staging
-        env:
-          APP_SIGNING_KEYFILE: ${{ steps.decodeKeystore.outputs.APP_SIGNING_KEYFILE }}
-          APP_SIGNING_PASS: ${{ secrets.APP_SIGNING_PASS }}
-          APP_SIGNING_ALIAS: ${{ secrets.APP_SIGNING_ALIAS }}
-
-      - uses: actions/upload-artifact@v2
-        with:
-          name: sampleapp-staging
-          path: build/sampleapp-staging/app/build/outputs/apk/release/app-release.apk
-      #@TODO: move this to releaseGitHub
-
   staging:
     environment: Staging
     needs: build
@@ -191,9 +168,21 @@ jobs:
       - run: ./scripts/incrementVersion --release --patch
         id: version
 
+      - name: Decode keystore used for Sample app signing
+        id: decodeKeystore
+        run: |
+          echo "${{ env.APP_SIGNING_KEYFILE_BASE64 }}" | base64 --decode - > "$HOME/SampleApplication.jks"
+          echo "::set-output name=APP_SIGNING_KEYFILE::$HOME/SampleApplication.jks"
+        env:
+          APP_SIGNING_KEYFILE_BASE64: ${{ secrets.APP_SIGNING_KEYFILE_BASE64 }}
+
       - name: Build sample app from released library
         run: ./gradlew build
         working-directory: sampleapp
+        env:
+          APP_SIGNING_KEYFILE: ${{ steps.decodeKeystore.outputs.APP_SIGNING_KEYFILE }}
+          APP_SIGNING_PASS: ${{ secrets.APP_SIGNING_PASS }}
+          APP_SIGNING_ALIAS: ${{ secrets.APP_SIGNING_ALIAS }}
 
       - uses: actions/download-artifact@v2
         with:
@@ -205,7 +194,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: "v${{ steps.version.outputs.releasedVersion }}"
           name: "${{ github.event.repository.name }} v${{ steps.version.outputs.releasedVersion }}"
-          artifacts: "sampleapp/app/build/outputs/apk/debug/app-debug.apk,maven-local.tar"
+          artifacts: "sampleapp/app/build/outputs/apk/release/app-release.apk,maven-local.tar"
           bodyFile: "UpcomingReleaseNotes.md"
 
       - uses: stefanzweifel/git-auto-commit-action@v4
