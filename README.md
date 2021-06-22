@@ -230,29 +230,29 @@ Also include `APP_SIGNING_PASS` and `APP_SIGNING_ALIAS` ("my-alias" in the examp
 
 Used by CI/CD pipelines to either obtain some information or modify the project.
 
-#### [getVersion](scripts/getVersion)
+#### [getVersion](ci-scripts/getVersion)
 Obtains and prints out current project version from [build.gradle](build.gradle).
 
-#### [incrementVersion](scripts/incrementVersion)
+#### [incrementVersion](ci-scripts/incrementVersion)
 Increments project version and versionCode in various files used by the library and sample application.
 
-#### [prepareLibraryTestsForStagingRepository](scripts/prepareLibraryTestsForStagingRepository)
+#### [prepareLibraryTestsForStagingRepository](ci-scripts/prepareLibraryTestsForStagingRepository)
 Library contains sources and instrumented tests.  
 Used to extract instrumented tests from the library into a new project, which does not have library sources.
 The newly created project depends on the previously built library, which is deployed to a staging repository.
 Staging repository is either in MavenCentral (privilegedBuild workflow) or MavenLocal (unprivilegedBuild workflow).
 
-#### [prepareSampleAppForStagingRepository](scripts/prepareSampleAppForStagingRepository)
+#### [prepareSampleAppForStagingRepository](ci-scripts/prepareSampleAppForStagingRepository)
 Sample application depends on a released version of the library.
 This script modifies sample application to create a new temporary project, which depends on library in staging repository.
 Using by the build jobs of privilegedBuild and unprivilegedBuild workflows.
 On release, production environment builds the sample application again, which does not rely on this script.
 
-#### [checkIfVersionReleased](scripts/checkIfVersionReleased)
+#### [checkIfVersionReleased](ci-scripts/checkIfVersionReleased)
 Checks if given URL is reachable. Used to verify that a released version is actually available in MavenCentral.
 Configurable timeout and retry count allows waiting until the version becomes available.
 
-#### [promoteStagingRepository](scripts/promoteStagingRepository)
+#### [promoteStagingRepository](ci-scripts/promoteStagingRepository)
 Promotes a given staging repository to MavenCentral.
 
 ## MavenCentral

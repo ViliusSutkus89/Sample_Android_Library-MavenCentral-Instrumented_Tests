@@ -20,7 +20,7 @@ allprojects {
         google()
         mavenCentral()
         //#STAGING-REPOSITORY#
-        // The line above is a placeholder token for scripts/prepareLibraryTestsForStagingRepository
+        // The line above is a placeholder token for ci-scripts/prepareLibraryTestsForStagingRepository
         // It will be replaced by either "mavenLocal()" or
         // "maven { url 'https://oss.sonatype.org/service/local/repositories/comviliussutkus89-????/content/' }"
     }

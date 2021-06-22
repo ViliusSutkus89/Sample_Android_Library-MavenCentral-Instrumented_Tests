@@ -16,7 +16,7 @@ jobs:
           # A branch is required for post release version increment commit
           ref: ${{ github.event.ref }}
 
-      - run: ./scripts/incrementVersion --patch
+      - run: ./ci-scripts/incrementVersion --patch
         id: version
 
       - uses: stefanzweifel/git-auto-commit-action@v4

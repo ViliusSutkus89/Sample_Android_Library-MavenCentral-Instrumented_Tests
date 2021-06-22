@@ -42,7 +42,7 @@ jobs:
           path: ~/.m2
 
       - name: Prepare sample app for staging repository
-        run: ./scripts/prepareSampleAppForStagingRepository sampleapp app --output=build/sampleapp-staging --repository=mavenLocal
+        run: ./ci-scripts/prepareSampleAppForStagingRepository sampleapp app --output=build/sampleapp-staging --repository=mavenLocal
 
       - name: Build sample app from staging library
         run: ./gradlew build
@@ -91,7 +91,7 @@ jobs:
           path: ~/.m2
 
       - name: Prepare library to run instrumented tests on staging library
-        run: scripts/prepareLibraryTestsForStagingRepository lib --output=build/lib-staging --repository=mavenLocal
+        run: ./ci-scripts/prepareLibraryTestsForStagingRepository lib --output=build/lib-staging --repository=mavenLocal
 
       - run: ./gradlew assemble
         working-directory: build/lib-staging
