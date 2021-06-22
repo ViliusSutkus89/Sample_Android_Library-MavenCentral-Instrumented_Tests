@@ -112,8 +112,7 @@ jobs:
           java-version: 8
       - uses: android-actions/setup-android@v2
 
-      - name: Prepare AAR Instrumented Tests
-        run: scripts/prepareLibraryTestsForStagingRepository lib --output=build/lib-staging --repository=${{ needs.build.outputs.STAGING_REPO_URI }}
+      - run: scripts/prepareLibraryTestsForStagingRepository lib --output=build/lib-staging --repository=${{ needs.build.outputs.STAGING_REPO_URI }}
 
       - run: ./gradlew assemble
         working-directory: build/lib-staging
