@@ -252,9 +252,6 @@ On release, production environment builds the sample application again, which do
 Checks if given URL is reachable. Used to verify that a released version is actually available in MavenCentral.
 Configurable timeout and retry count allows waiting until the version becomes available.
 
-#### [promoteStagingRepository](ci-scripts/promoteStagingRepository)
-Promotes a given staging repository to MavenCentral.
-
 ## MavenCentral
 
 Publishing to MavenCentral requires setting up an account with Sonatype.  

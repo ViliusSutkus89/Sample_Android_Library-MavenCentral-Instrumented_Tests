@@ -131,9 +131,9 @@ jobs:
     needs: [build, staging]
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
-      - run: ./ci-scripts/promoteStagingRepository ${{ needs.build.outputs.STAGING_REPO }} --nexusUrl=https://oss.sonatype.org/service/local/
-        env:
+      - uses: ViliusSutkus89/promote-Nexus-repository-to-MavenCentral@v1
+        with:
+          repositoryURI: ${{ needs.build.outputs.STAGING_REPO_URI }}
           sonatypeUsername: ${{ secrets.SONATYPE_USERNAME }}
           sonatypePassword: ${{ secrets.SONATYPE_PASSWORD }}
 
