@@ -1,1 +1,0 @@
-Remove promoteStagingRepository script, use external GitHub action ViliusSutkus89/promote-Nexus-repository-to-MavenCentral@v1 instead.
