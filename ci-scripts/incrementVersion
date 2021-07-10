@@ -17,9 +17,10 @@ use fileUpdater;
 use getVersion;
 
 sub usage {
-    print STDERR './', File::Basename::basename(__FILE__), " --major|--minor|--patch [--release]\n";
+    print STDERR './', File::Basename::basename(__FILE__), " --major|--minor|--patch [--release] [requestedVersion]\n";
     print STDERR "\tMandatory: major, minor or patch to choose witch version to increment.\n";
     print STDERR "\tOptional: release to updated README.md and other release files.\n";
+    print STDERR "\tOptional: requestedVersion, to specify new major, minor or patch number.\n";
     exit 1;
 }
 
@@ -29,25 +30,29 @@ my $oldVersion = getVersion::getVersion();
 my $oldVersionCode = getVersion::getVersionCode();
 my ($newVersion, $newVersionCode);
 
-my ($upMajor, $upMinor, $upPatch, $isRelease, $help);
+my ($upMajor, $upMinor, $upPatch, $isRelease, $help, $requestedVersion);
 Getopt::Long::GetOptions(major => \$upMajor, minor => \$upMinor, patch => \$upPatch, release => \$isRelease, 'help' => \$help);
 if (defined $help) {
     usage();
 }
 
+if (@ARGV) {
+    $requestedVersion = shift;
+}
+
 my ($major, $minor, $patch_) = $oldVersion =~ /(\d+)\.(\d+)\.(\d+)/;
 if (defined $upMajor) {
-    $major++;
+    $major = (defined $requestedVersion) ? $requestedVersion : $major + 1;
     $newVersion = "${major}.0.0";
     $newVersionCode = $oldVersionCode + 100;
 }
 elsif (defined $upMinor) {
-    $minor++;
+    $minor = (defined $requestedVersion) ? $requestedVersion : $minor + 1;
     $newVersion = "${major}.${minor}.0";
     $newVersionCode = $oldVersionCode + 10;
 }
 elsif (defined $upPatch) {
-    $patch_++;
+    $patch_ = (defined $requestedVersion) ? $requestedVersion : $patch_ + 1;
     $newVersion = "${major}.${minor}.${patch_}";
     $newVersionCode = $oldVersionCode + 1;
 }
