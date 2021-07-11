@@ -127,11 +127,14 @@ jobs:
 
   releaseSonatype:
     environment: ReleaseSonatype
-    # Needs to depend on build, to obtain STAGING_REPO
+    # Needs to depend on build too, to obtain STAGING_REPO_URL
     needs: [build, staging]
     runs-on: ubuntu-20.04
+    outputs:
+      ARTIFACTS: ${{ steps.promote.outputs.artifacts }}
     steps:
       - uses: ViliusSutkus89/promote-Nexus-repository-to-MavenCentral@v1
+        id: promote
         with:
           repositoryURL: ${{ needs.build.outputs.STAGING_REPO_URL }}
           sonatypeUsername: ${{ secrets.SONATYPE_USERNAME }}
@@ -159,13 +162,9 @@ jobs:
       - run: ./ci-scripts/incrementVersion --release --patch
         id: version
 
-      # samplelib/1.0.0/samplelib-1.0.0.aar or samplelib/1.0.0/samplelib-1.0.0.pom may be available,
-      # but whole samplelib/1.0.0/ directory might 404. I assume this is due to web server caching.
-      - run: >
-          ./ci-scripts/checkIfVersionReleased --retries=10 --timeout=60
-          https://repo1.maven.org/maven2/com/viliussutkus89/samplelib/${{steps.version.outputs.releasedVersion}}/samplelib-${{steps.version.outputs.releasedVersion}}.aar
-          https://repo1.maven.org/maven2/com/viliussutkus89/samplelib/${{steps.version.outputs.releasedVersion}}/samplelib-${{steps.version.outputs.releasedVersion}}.pom
-          https://repo1.maven.org/maven2/com/viliussutkus89/samplelib/${{steps.version.outputs.releasedVersion}}/
+      - uses: ViliusSutkus89/WaitForURLsToBeAvailable@v1
+        with:
+          URLs: ${{ needs.releaseSonatype.outputs.ARTIFACTS }}
 
       - name: Decode keystore used for Sample app signing
         id: decodeKeystore
