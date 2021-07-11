@@ -25,7 +25,7 @@ jobs:
     environment: BuildWithDeployToSonatype
     outputs:
       STAGING_REPO: ${{ steps.sonatype.outputs.stagingRepo }}
-      STAGING_REPO_URI: ${{ steps.sonatype.outputs.stagingRepoUri }}
+      STAGING_REPO_URL: ${{ steps.sonatype.outputs.stagingRepoUrl }}
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -54,10 +54,10 @@ jobs:
         # Created staging repository 'comviliussutkus89-1055' at https://oss.sonatype.org/service/local/repositories/comviliussutkus89-1055/content/
 
         # .(.+). should be '(.+)', to match 'comviliussutkus89-1055', but we already far too deep in qoutes for a simple \' to work.
-        run: perl -ne 'print "::set-output name=stagingRepo::$2\n::set-output name=stagingRepoUri::$3\n::warning ::$1\n" if /^(Created staging repository .(.+). at (.+))$/' < publishToSonatype.log
+        run: perl -ne 'print "::set-output name=stagingRepo::$2\n::set-output name=stagingRepoUrl::$3\n::warning ::$1\n" if /^(Created staging repository .(.+). at (.+))$/' < publishToSonatype.log
 
       - name: Prepare sample app for staging repository
-        run: ./ci-scripts/prepareSampleAppForStagingRepository sampleapp app --output=build/sampleapp-staging --repository=${{ steps.sonatype.outputs.stagingRepoUri }}
+        run: ./ci-scripts/prepareSampleAppForStagingRepository sampleapp app --output=build/sampleapp-staging --repository=${{ steps.sonatype.outputs.stagingRepoUrl }}
 
       - name: Build sample app from staging library
         run: ./gradlew build
@@ -112,7 +112,7 @@ jobs:
           java-version: 8
       - uses: android-actions/setup-android@v2
 
-      - run: ./ci-scripts/prepareLibraryTestsForStagingRepository lib --output=build/lib-staging --repository=${{ needs.build.outputs.STAGING_REPO_URI }}
+      - run: ./ci-scripts/prepareLibraryTestsForStagingRepository lib --output=build/lib-staging --repository=${{ needs.build.outputs.STAGING_REPO_URL }}
 
       - run: ./gradlew assemble
         working-directory: build/lib-staging
@@ -133,7 +133,7 @@ jobs:
     steps:
       - uses: ViliusSutkus89/promote-Nexus-repository-to-MavenCentral@v1
         with:
-          repositoryURI: ${{ needs.build.outputs.STAGING_REPO_URI }}
+          repositoryURL: ${{ needs.build.outputs.STAGING_REPO_URL }}
           sonatypeUsername: ${{ secrets.SONATYPE_USERNAME }}
           sonatypePassword: ${{ secrets.SONATYPE_PASSWORD }}
 
@@ -156,16 +156,16 @@ jobs:
           java-version: 8
       - uses: android-actions/setup-android@v2
 
+      - run: ./ci-scripts/incrementVersion --release --patch
+        id: version
+
       # samplelib/1.0.0/samplelib-1.0.0.aar or samplelib/1.0.0/samplelib-1.0.0.pom may be available,
       # but whole samplelib/1.0.0/ directory might 404. I assume this is due to web server caching.
       - run: >
           ./ci-scripts/checkIfVersionReleased --retries=10 --timeout=60
-          https://repo1.maven.org/maven2/com/viliussutkus89/samplelib/{VERSION_TOKEN}/samplelib-{VERSION_TOKEN}.aar
-          https://repo1.maven.org/maven2/com/viliussutkus89/samplelib/{VERSION_TOKEN}/samplelib-{VERSION_TOKEN}.pom
-          https://repo1.maven.org/maven2/com/viliussutkus89/samplelib/{VERSION_TOKEN}/
-
-      - run: ./ci-scripts/incrementVersion --release --patch
-        id: version
+          https://repo1.maven.org/maven2/com/viliussutkus89/samplelib/${{steps.version.outputs.releasedVersion}}/samplelib-${{steps.version.outputs.releasedVersion}}.aar
+          https://repo1.maven.org/maven2/com/viliussutkus89/samplelib/${{steps.version.outputs.releasedVersion}}/samplelib-${{steps.version.outputs.releasedVersion}}.pom
+          https://repo1.maven.org/maven2/com/viliussutkus89/samplelib/${{steps.version.outputs.releasedVersion}}/
 
       - name: Decode keystore used for Sample app signing
         id: decodeKeystore
