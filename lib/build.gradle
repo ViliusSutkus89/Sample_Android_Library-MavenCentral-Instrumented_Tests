@@ -39,6 +39,7 @@ dependencies {
 task sourceJar(type: Jar) {
     archiveClassifier.set('sources')
     into ("", { from android.sourceSets.main.java.srcDirs} )
+    into ("", { from file("../LICENSE")})
 }
 
 task javadoc(type: Javadoc) {
