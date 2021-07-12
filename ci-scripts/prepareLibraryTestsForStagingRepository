@@ -58,7 +58,6 @@ $aarStaging->update('build.gradle', sub {
 });
 $aarStaging->update('settings.gradle', sub {
     $_ = shift;
-    s/["']\:tmpfile["'], //;
     s/^(rootProject\.name\s*=\s*["'].+)(["'])$/${1}${suffix}${2}/;
     return $_;
 });
