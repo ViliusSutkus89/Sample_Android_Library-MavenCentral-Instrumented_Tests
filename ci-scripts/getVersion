@@ -6,16 +6,20 @@ use strict;
 use warnings;
 
 use base 'Exporter';
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 our @EXPORT = qw(getVersion);
 our @EXPORT_OK = qw(getVersionCode);
 
 use File::Basename 'dirname';
-use lib File::Basename::dirname(__FILE__) . '/lib';
+
+my $scriptsDir = pathResolver::getAbsolutePath(File::Basename::dirname(__FILE__));
+if (caller()) {
+    $scriptsDir = File::Basename::dirname($scriptsDir)
+}
+use lib $scriptsDir . '/lib';
 use fileParser 'grepSingleLine';
 use pathResolver 'getAbsolutePath';
 
-my $scriptsDir = pathResolver::getAbsolutePath(File::Basename::dirname(__FILE__));
 my $rootDir = File::Basename::dirname($scriptsDir);
 
 sub getVersion {
