@@ -24,7 +24,6 @@ jobs:
   build:
     environment: BuildWithDeployToSonatype
     outputs:
-      STAGING_REPO: ${{ steps.sonatype.outputs.stagingRepo }}
       STAGING_REPO_URL: ${{ steps.sonatype.outputs.stagingRepoUrl }}
     runs-on: ubuntu-20.04
     steps:
@@ -52,9 +51,7 @@ jobs:
         id: sonatype
         # publishToSonatype.log contains a line looking like this:
         # Created staging repository 'comviliussutkus89-1055' at https://oss.sonatype.org/service/local/repositories/comviliussutkus89-1055/content/
-
-        # .(.+). should be '(.+)', to match 'comviliussutkus89-1055', but we already far too deep in qoutes for a simple \' to work.
-        run: perl -ne 'print "::set-output name=stagingRepo::$2\n::set-output name=stagingRepoUrl::$3\n::warning ::$1\n" if /^(Created staging repository .(.+). at (.+))$/' < publishToSonatype.log
+        run: perl -ne 'print "::set-output name=stagingRepoUrl::$2\n::warning ::$1\n" if /^(Created staging repository .+ at (.+))$/' < publishToSonatype.log
 
       - name: Prepare sample app for staging repository
         run: ./ci-scripts/prepareSampleAppForStagingRepository sampleapp app --output=build/sampleapp-staging --repository=${{ steps.sonatype.outputs.stagingRepoUrl }}
