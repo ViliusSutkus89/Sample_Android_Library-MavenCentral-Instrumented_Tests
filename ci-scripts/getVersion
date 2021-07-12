@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# getVersion.pm is symlinked to getVersion
+# ci-scripts/lib/getVersion.pm is symlinked to ci-scripts/getVersion
 # This is needed to make this script both a module and a script.
 package getVersion;
 use strict;
@@ -11,7 +11,7 @@ our @EXPORT = qw(getVersion);
 our @EXPORT_OK = qw(getVersionCode);
 
 use File::Basename 'dirname';
-use lib dirname(__FILE__);
+use lib File::Basename::dirname(__FILE__) . '/lib';
 use fileParser 'grepSingleLine';
 use pathResolver 'getAbsolutePath';
 

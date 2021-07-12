@@ -2,7 +2,7 @@ package fileParser;
 use strict;
 use warnings;
 use base 'Exporter';
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 our @EXPORT = qw(grepSingleLine);
 
 sub grepSingleLine {

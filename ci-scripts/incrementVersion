@@ -12,7 +12,7 @@ use strict;
 
 use File::Basename;
 use Getopt::Long;
-use lib File::Basename::dirname(__FILE__);
+use lib File::Basename::dirname(__FILE__) . '/lib';
 use fileUpdater;
 use getVersion;
 

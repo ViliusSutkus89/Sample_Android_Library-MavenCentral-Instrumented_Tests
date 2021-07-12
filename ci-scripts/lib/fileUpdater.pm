@@ -3,7 +3,7 @@ use warnings;
 use strict;
 
 use base 'Exporter';
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use File::Find 'find';
 use File::Path 'make_path';
