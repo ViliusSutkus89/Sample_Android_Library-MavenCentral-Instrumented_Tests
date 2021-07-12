@@ -1,1 +1,0 @@
-checkIfVersionReleased script replaced with external GitHub action
