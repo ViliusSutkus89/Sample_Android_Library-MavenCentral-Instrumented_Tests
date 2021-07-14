@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use base 'Exporter';
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 our @EXPORT = qw(getVersion);
 our @EXPORT_OK = qw(getVersionCode);
 
@@ -21,10 +21,9 @@ sub getLibDir {
 
 use lib getLibDir();
 use fileParser 'grepSingleLine';
-use pathResolver 'getAbsolutePath';
+use pathResolver 'getAbsolutePath', 'getAbsolutePathOfBasedir';
 
-my $libDirAbs = pathResolver::getAbsolutePath(getLibDir());
-my $rootDir = File::Basename::dirname(File::Basename::dirname($libDirAbs));
+my $rootDir = pathResolver::getAbsolutePathOfBasedir(getLibDir, 2);
 
 sub getVersion {
     my ($version) = fileParser::grepSingleLine(
