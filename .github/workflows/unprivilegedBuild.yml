@@ -1,5 +1,7 @@
 name: unprivilegedBuild
 on:
+  push:
+    branches-ignore: [ master, main ]
   workflow_dispatch:
   pull_request:
     paths-ignore:
