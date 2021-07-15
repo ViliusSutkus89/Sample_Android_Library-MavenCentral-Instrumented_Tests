@@ -88,6 +88,11 @@ jobs:
           name: sampleapp-staging
           path: build/sampleapp-staging/app/build/outputs/apk/**/*.apk
 
+      - uses: actions/upload-artifact@v2
+        with:
+          name: sampleapp-lint-results
+          path: build/sampleapp-staging/app/build/reports/*
+
   staging:
     environment: Staging
     needs: build
@@ -200,7 +205,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: "v${{ steps.version.outputs.releasedVersion }}"
           name: "${{ github.event.repository.name }} v${{ steps.version.outputs.releasedVersion }}"
-          artifacts: "sampleapp/app/build/outputs/apk/release/*.apk,maven-local.tar"
+          artifacts: "maven-local.tar,sampleapp/app/build/outputs/apk/release/*.apk,sampleapp/app/build/reports/*"
           bodyFile: "UpcomingReleaseNotes.md"
 
       - uses: stefanzweifel/git-auto-commit-action@v4

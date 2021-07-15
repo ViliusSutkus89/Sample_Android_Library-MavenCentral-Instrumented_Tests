@@ -70,6 +70,11 @@ jobs:
           name: sampleapp-staging
           path: build/sampleapp-staging/app/build/outputs/apk/**/*.apk
 
+      - uses: actions/upload-artifact@v2
+        with:
+          name: sampleapp-lint-results
+          path: build/sampleapp-staging/app/build/reports/*
+
   staging:
     needs: build
     environment: BuildUnprivileged
