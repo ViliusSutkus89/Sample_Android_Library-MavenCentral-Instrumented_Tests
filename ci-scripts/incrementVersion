@@ -101,6 +101,12 @@ my $rootDirectory = File::Basename::dirname(pathResolver::getAbsolutePath(File::
 my $versionIncrementer = fileUpdater->new({ rootDirectory => $rootDirectory });
 
 if (defined $isRelease) {
+    $versionIncrementer->update('README.md', sub {
+        $_ = shift;
+        s/^(\s+implementation\s+['"]com\.viliussutkus89\:samplelib\:)[\d\.]+(['"])$/${1}${oldVersion}${2}/;
+        return $_;
+    });
+
     $versionIncrementer->update('sampleapp/app/build.gradle', sub {
         $_ = shift;
         s/^(\s+versionName\s+['"])[\d\.]+(['"])$/${1}${oldVersion}${2}/;
@@ -109,7 +115,7 @@ if (defined $isRelease) {
         return $_;
     });
 
-    print "::set-output name=files::sampleapp/app/build.gradle\n";
+    print "::set-output name=files::README.md sampleapp/app/build.gradle\n";
 } else {
     $versionIncrementer->update('build.gradle', sub {
         $_ = shift;
