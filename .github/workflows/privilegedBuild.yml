@@ -1,4 +1,4 @@
-# privilegedBuild.yml - v1.00
+# privilegedBuild.yml - v1.01
 # https://github.com/ViliusSutkus89/Sample_Android_Library-MavenCentral-Instrumented_Tests/blob/master/.github/workflows/privilegedBuild.yml
 
 name: privilegedBuild
@@ -65,6 +65,11 @@ jobs:
         with:
           name: maven-local.tar
           path: maven-local.tar
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: library-lint-results
+          path: lib/build/reports/*
 
   buildSampleApp:
     needs: build
