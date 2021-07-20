@@ -262,10 +262,6 @@ This script modifies sample application to create a new temporary project, which
 Using by the build jobs of privilegedBuild and unprivilegedBuild workflows.
 On release, production environment builds the sample application again, which does not rely on this script.
 
-#### [checkIfVersionReleased](ci-scripts/checkIfVersionReleased)
-Checks if given URL is reachable. Used to verify that a released version is actually available in MavenCentral.
-Configurable timeout and retry count allows waiting until the version becomes available.
-
 ## MavenCentral
 
 Publishing to MavenCentral requires setting up an account with Sonatype.  
