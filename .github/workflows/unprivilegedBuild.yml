@@ -90,21 +90,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        api-level: [16, 21, 31]
-        arch: [x86, x86_64]
+        # Run on first and last available version on each supported arch
+        # x86-android-16, x86-android-30
+        # x86_64-android-21 , x86_64-android-31
+        api-level: [16, 21, 30, 31]
+        arch: [x86]
         target: [default]
         include:
-          - api-level: 31
-            arch: x86
-            target: google_apis
+          - api-level: 21
+            arch: x86_64
           - api-level: 31
             arch: x86_64
             target: google_apis
-        exclude:
-          - api-level: 16
-            arch: x86_64
-          - api-level: 31
-            target: default
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-java@v2
