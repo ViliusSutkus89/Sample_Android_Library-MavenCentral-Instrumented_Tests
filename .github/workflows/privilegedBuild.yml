@@ -47,7 +47,7 @@ permissions:
 
 jobs:
   buildLibrary:
-    environment: LibrarySignatureWithSonatypeAccess
+    environment: LibraryKeyAndSonatypeAccess
     outputs:
       STAGING_REPO_URL: ${{ steps.sonatype.outputs.stagingRepoUrl }}
     runs-on: ubuntu-20.04

@@ -69,9 +69,9 @@ Used to increment project version and commit changes to source control.
 
 ## Environments
 
-All defined environments are accessible only in privilegedBuild workflow.
+Following environments are used only in privilegedBuild workflow.
 
-#### LibrarySignatureWithSonatypeAccess - (buildLibrary job)
+#### LibraryKeyAndSonatypeAccess - (buildLibrary job)
 Environment contains the following secrets:  
 `SIGNING_KEY`, `SIGNING_PASS` - ASCII armored private key and password used for signing library artifacts.  
 `SONATYPE_USERNAME`, `SONATYPE_PASSWORD` - User token (not the actual login to oss.sonatype.org), obtained through oss.sonatype.org -> Profile -> User Token.
