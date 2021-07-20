@@ -6,7 +6,7 @@ android {
     defaultConfig {
         applicationId "com.viliussutkus89.samplelib.sampleapp"
         minSdkVersion 16
-        targetSdkVersion 31
+        targetSdkVersion 30
         versionCode 26
         versionName '1.1.4'
 
