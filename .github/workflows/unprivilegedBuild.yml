@@ -1,3 +1,6 @@
+# unprivilegedBuild.yml - v1.00
+# https://github.com/ViliusSutkus89/Sample_Android_Library-MavenCentral-Instrumented_Tests/blob/master/.github/workflows/unprivilegedBuild.yml
+
 name: unprivilegedBuild
 on:
   workflow_dispatch:

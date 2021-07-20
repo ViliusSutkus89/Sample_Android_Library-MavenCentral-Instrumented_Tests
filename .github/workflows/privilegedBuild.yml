@@ -1,3 +1,6 @@
+# privilegedBuild.yml - v1.00
+# https://github.com/ViliusSutkus89/Sample_Android_Library-MavenCentral-Instrumented_Tests/blob/master/.github/workflows/privilegedBuild.yml
+
 name: privilegedBuild
 on:
   workflow_dispatch:
