@@ -44,7 +44,6 @@ jobs:
           path: lib/build/reports/lint-results.html
 
       - run: ./gradlew publishToMavenLocal
-
       - uses: actions/upload-artifact@v2
         with:
           name: maven-local
@@ -121,9 +120,6 @@ jobs:
 
       - name: Prepare library to run instrumented tests on staging library
         run: ./ci-scripts/prepareLibraryTestsForStagingRepository lib --output=build/lib-staging --repository=mavenLocal
-
-      - run: ./gradlew assemble
-        working-directory: build/lib-staging
 
       - uses: reactivecircus/android-emulator-runner@v2
         with:
