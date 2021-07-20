@@ -1,4 +1,4 @@
-# unprivilegedBuild.yml - v1.00
+# unprivilegedBuild.yml - v1.1
 # https://github.com/ViliusSutkus89/Sample_Android_Library-MavenCentral-Instrumented_Tests/blob/master/.github/workflows/unprivilegedBuild.yml
 
 name: unprivilegedBuild
@@ -39,8 +39,8 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: library-lint-results
-          path: lib/build/reports/*
+          name: library-lint-report.html
+          path: lib/build/reports/lint-results.html
 
       - run: ./gradlew publishToMavenLocal
 
@@ -74,13 +74,13 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: sampleapp-staging
+          name: sampleapp-staging-apks
           path: build/sampleapp-staging/app/build/outputs/apk/**/*.apk
 
       - uses: actions/upload-artifact@v2
         with:
-          name: sampleapp-lint-results
-          path: build/sampleapp-staging/app/build/reports/*
+          name: sampleapp-lint-report.html
+          path: build/sampleapp-staging/app/build/reports/lint-results.html
 
   staging:
     needs: build
