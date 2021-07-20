@@ -131,3 +131,8 @@ jobs:
           target: ${{ matrix.target }}
           script: ./gradlew connectedCheck
           working-directory: build/lib-staging
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: instrumentedTestsReport-${{ matrix.api-level }}-${{ matrix.arch }}
+          path: build/lib-staging/lib/build/reports/androidTests/connected
