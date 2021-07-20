@@ -26,58 +26,68 @@ This means that after a build break, the badge will stay red until a new release
 ## Workflows
 
 #### [privilegedBuild.yml](.github/workflows/privilegedBuild.yml)
-Triggered either by push to master or main branch or manually (`workflow_dispatch`).
-Composed of four jobs:
-1) build:
-   1) Compiles the library, signs it with a private key. 
-   1) Deploys build artifacts to a staging repository in MavenCentral.
-   1) Deploys build artifacts to MavenLocal (~/.m2) for easier file access during GitHub release creation.
-1) staging:
-   1) Prepares instrumented tests to be executed against library in the staging repository.
-   1) Runs instrumented tests on a matrix of emulated Android devices.
-1) releaseSonatype: Promotes the staging repository to MavenCentral.
-1) releaseGitHub:
-   1) Increments library version in git repository.
-   1) Builds sample application against the newly released library.
-   1) Creates GitHub release and post release version increment commit.
+Triggered either by push to main/master branch or manually (`workflow_dispatch`).  
+Composed of six jobs:
+1) buildLibrary:
+   1) Compiles the library and signs it with a private key. 
+   1) Deploys build artifacts to a Sonatype staging repository.
+   1) Deploys build artifacts to MavenLocal (~/.m2) and saves ~/.m2 as maven-local.tar, to be included in GitHub release.
+   1) Saves lint results as library-lint-results.html, to be included in GitHub release.
+1) buildSampleAppStaging (depends on buildLibrary):
+   1) Builds sample application against the library deployed to Sonatype staging repository.
+   1) Artifacts APKs as sampleapp-staging-apks. Will not be attached to GitHub release.
+   1) Artifacts lint report as sampleapp-staging-lint-report.html. Will not be attached to GitHub release.
+1) runInstrumentedTests (depends on buildLibrary):
+   1) Runs instrumented tests on a matrix of emulated Android devices against the library deployed to Sonatype staging repository.
+   1) Artifacts test report as instrumentedTestsReport-${{ matrix.api-level }}-${{ matrix.arch }}.tar, to be included in GitHub release.
+1) releaseSonatype (depends on buildLibrary and runInstrumentedTests):
+   Promotes the Sonatype staging repository to MavenCentral.
+1) releaseGitHub (depends on releaseSonatype):
+   1) Waits for release to propagate to MavenCentral.
+   1) Updates sample application version.
+   1) Creates GitHub release.
+   1) Increments library version.
+1) buildSampleApp (depends on releaseGitHub):  
+   1) Builds sample application against the released library.
+   1) Attaches APKs and lint-results.html to GitHub release.
 
 #### [unprivilegedBuild.yml](.github/workflows/unprivilegedBuild.yml)
-Triggered either by pull request or manually (`workflow_dispatch`).
-1) Build. Compiles the library, deploys to mavenLocal (~/.m2), builds sample application.
-2) Staging. Runs instrumented tests on a matrix of emulated Android devices against the library deployed to a staging repository in MavenLocal (~/.m2).
+Triggered either by push to branch other than main/master or manually (`workflow_dispatch`).  
+Composed of three jobs:
+1) buildLibrary. Builds the library and deploys to MavenLocal (~/.m2).
+1) buildSampleApp. Depends on buildLibrary.  
+   1) Builds the sample application against the library deployed to a staging repository in MavenLocal (~/.m2).
+   1) Artifacts APKs as sampleapp-staging-apks.
+   1) Artifacts lint report as sampleapp-staging-lint-report.html.
+1) runInstrumentedTests. Depends on buildLibrary.  
+   1) Runs instrumented tests on a matrix of emulated Android devices against the library deployed to a staging repository in MavenLocal (~/.m2).
+   1) Artifacts test report as instrumentedTestsReport-${{ matrix.api-level }}-${{ matrix.arch }}.tar.
 
 #### [manualVersionIncrement_{major,minor,patch}.yml](.github/workflows/manualVersionIncrement_major.yml)
 Triggered only manually (`workflow_dispatch`).  
 Used to increment project version and commit changes to source control.
 
 ## Environments
-#### BuildWithDeployToSonatype - (privilegedBuild workflow)
-Used by the build job.  
+
+All defined environments are accessible only in privilegedBuild workflow.
+
+#### LibrarySignatureWithSonatypeAccess - (buildLibrary job)
 Environment contains the following secrets:  
-`SIGNING_KEY`, `SIGNING_PASS` - ASCII armored private key and password.  
+`SIGNING_KEY`, `SIGNING_PASS` - ASCII armored private key and password used for signing library artifacts.  
 `SONATYPE_USERNAME`, `SONATYPE_PASSWORD` - User token (not the actual login to oss.sonatype.org), obtained through oss.sonatype.org -> Profile -> User Token.
 
-#### Staging - (privilegedBuild workflow)
-Used by the staging job, which depends on build job.  
-Has no need to be an actual environment, because it contains no secrets and no protection rules.  
-Is an environment just for clarity.
-
-#### ReleaseSonatype - (privilegedBuild workflow)
-Used by the releaseSonatype job, which depends on staging job.  
+#### SonatypeAccess - (releaseSonatype job)
 Has manual review protection rule, which is used to gate builds.  
 Environment contains the following secrets:   
 `SONATYPE_USERNAME`, `SONATYPE_PASSWORD` - User token (not the actual login to oss.sonatype.org), obtained through oss.sonatype.org -> Profile -> User Token.
 
-#### ReleaseGitHub - (privilegedBuild workflow)
-Used by the releaseGitHub job, which depends on releaseSonatype job.
+#### TenMinuteWait - (releaseGitHub job)
+Used by the releaseGitHub job.
 Has a timed gate, to ensure Sonatype release propagation to MavenCentral.
-Environment contains the following secrets:
-`APP_SIGNING_KEYFILE_BASE64`, `APP_SIGNING_PASS`, `APP_SIGNING_ALIAS` - keystore used for sample application signing.
 
-#### BuildUnprivileged - (unprivilegedBuild workflow)
-Used by the build and staging jobs in the unprivilegedBuild workflow.
-Has no need to be an actual environment, because it contains no secrets and no protection rules.  
-Is an environment just for clarity.
+#### SampleAppKeystore - (buildSampleApp job)
+Environment contains the following secrets:  
+`APP_SIGNING_KEYFILE_BASE64`, `APP_SIGNING_PASS`, `APP_SIGNING_ALIAS` - keystore used for sample application signing.
 
 ## Cryptographic signature
 
