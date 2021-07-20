@@ -82,7 +82,7 @@ jobs:
           name: sampleapp-lint-report.html
           path: build/sampleapp-staging/app/build/reports/lint-results.html
 
-  staging:
+  runInstrumentedTests:
     needs: build
     environment: BuildUnprivileged
     # Only macos VMs are available with exposed CPU extensions to run hardware accelerated emulator
