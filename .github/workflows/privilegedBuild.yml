@@ -106,7 +106,7 @@ jobs:
       - uses: android-actions/setup-android@v2
 
       - name: Prepare sample app for staging repository
-        run: ./ci-scripts/prepareSampleAppForStagingRepository sampleapp app --output=build/sampleapp-staging --repository=${{ needs.build.outputs.STAGING_REPO_URL }}
+        run: ./ci-scripts/prepareSampleAppForStagingRepository sampleapp app --output=build/sampleapp-staging --repository=${{ needs.buildLibrary.outputs.STAGING_REPO_URL }}
 
       - name: Build sample app from staging library
         run: ./gradlew build
