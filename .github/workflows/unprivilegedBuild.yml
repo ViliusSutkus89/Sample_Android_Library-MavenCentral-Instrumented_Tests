@@ -5,7 +5,8 @@ name: unprivilegedBuild
 on:
   workflow_dispatch:
   push:
-    branches-ignore: [ master, main ]
+# @TODO: reenable after checking
+#    branches-ignore: [ master, main ]
     paths-ignore:
       - '**.md'
       - '.github/workflows/manualVersionIncrement*.yml'
