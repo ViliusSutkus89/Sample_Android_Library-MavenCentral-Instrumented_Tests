@@ -46,8 +46,8 @@ permissions:
   statuses: none
 
 jobs:
-  build:
-    environment: BuildWithDeployToSonatype
+  buildLibrary:
+    environment: LibrarySignatureWithSonatypeAccess
     outputs:
       STAGING_REPO_URL: ${{ steps.sonatype.outputs.stagingRepoUrl }}
     runs-on: ubuntu-20.04
@@ -59,7 +59,7 @@ jobs:
           java-version: 8
       - uses: android-actions/setup-android@v2
 
-      - run: ./gradlew assembleRelease
+      - run: ./gradlew build
 
       - name: 'Publish to Sonatype'
         run: ./gradlew publishToSonatype closeSonatypeStagingRepository | tee publishToSonatype.log
@@ -88,13 +88,14 @@ jobs:
           name: maven-local.tar
           path: maven-local.tar
 
+      - run: mv lib/build/reports/lint-results.html lib/build/reports/library-lint-results.html
       - uses: actions/upload-artifact@v2
         with:
-          name: library-lint-results
-          path: lib/build/reports/*
+          name: library-lint-results.html
+          path: lib/build/reports/library-lint-results.html
 
-  buildSampleApp:
-    needs: build
+  buildSampleAppStaging:
+    needs: buildLibrary
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -113,17 +114,16 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: sampleapp-staging
+          name: sampleapp-staging-apks
           path: build/sampleapp-staging/app/build/outputs/apk/**/*.apk
 
       - uses: actions/upload-artifact@v2
         with:
-          name: sampleapp-lint-results
-          path: build/sampleapp-staging/app/build/reports/*
+          name: sampleapp-staging-lint-report.html
+          path: build/sampleapp-staging/app/build/reports/lint-results.html
 
-  staging:
-    environment: Staging
-    needs: build
+  runInstrumentedTests:
+    needs: buildLibrary
     # Only macos VMs are available with exposed CPU extensions to run hardware accelerated emulator
     runs-on: macos-10.15
     strategy:
@@ -154,10 +154,7 @@ jobs:
           java-version: 8
       - uses: android-actions/setup-android@v2
 
-      - run: ./ci-scripts/prepareLibraryTestsForStagingRepository lib --output=build/lib-staging --repository=${{ needs.build.outputs.STAGING_REPO_URL }}
-
-      - run: ./gradlew assemble
-        working-directory: build/lib-staging
+      - run: ./ci-scripts/prepareLibraryTestsForStagingRepository lib --output=build/lib-staging --repository=${{ needs.buildLibrary.outputs.STAGING_REPO_URL }}
 
       - uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -167,10 +164,16 @@ jobs:
           script: ./gradlew connectedCheck
           working-directory: build/lib-staging
 
+      - run: tar -cvf instrumentedTestsReport-${{ matrix.api-level }}-${{ matrix.arch }}.tar build/lib-staging/lib/build/reports/androidTests/connected
+      - uses: actions/upload-artifact@v2
+        with:
+          name: instrumentedTestsReport-${{ matrix.api-level }}-${{ matrix.arch }}.tar
+          path: instrumentedTestsReport-${{ matrix.api-level }}-${{ matrix.arch }}.tar
+
   releaseSonatype:
-    environment: ReleaseSonatype
-    # Needs to depend on build too, to obtain STAGING_REPO_URL
-    needs: [build, staging]
+    environment: SonatypeAccess
+    # Needs to depend on buildLibrary too, to obtain STAGING_REPO_URL
+    needs: [runInstrumentedTests, buildLibrary]
     runs-on: ubuntu-20.04
     outputs:
       ARTIFACTS: ${{ steps.promote.outputs.artifacts }}
@@ -178,16 +181,18 @@ jobs:
       - uses: ViliusSutkus89/promote-Nexus-repository-to-MavenCentral@v1
         id: promote
         with:
-          repositoryURL: ${{ needs.build.outputs.STAGING_REPO_URL }}
+          repositoryURL: ${{ needs.buildLibrary.outputs.STAGING_REPO_URL }}
           sonatypeUsername: ${{ secrets.SONATYPE_USERNAME }}
           sonatypePassword: ${{ secrets.SONATYPE_PASSWORD }}
 
   releaseGitHub:
-    environment: ReleaseGitHub
+    environment: TenMinuteWait
     needs: releaseSonatype
     permissions:
-      # Needed to make a version increment commit, maybe GitHub release too.
+      # Permission needed to create GitHub release and version increment commit.
       contents: write
+    outputs:
+      RELEASE_TAG: "v${{ steps.preReleaseVersionUpdate.outputs.releasedVersion }}"
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -195,55 +200,83 @@ jobs:
           # A branch is required for post release version increment commit
           ref: ${{ github.event.ref }}
 
-      - uses: actions/setup-java@v2
-        with:
-          distribution: zulu
-          java-version: 8
-      - uses: android-actions/setup-android@v2
-
-      - run: ./ci-scripts/incrementVersion --release --patch
-        id: version
-
       - uses: ViliusSutkus89/WaitForURLsToBeAvailable@v1
         with:
           URLs: ${{ needs.releaseSonatype.outputs.ARTIFACTS }}
 
-      - name: Decode keystore used for Sample app signing
-        id: decodeKeystore
-        run: |
-          echo "${{ env.APP_SIGNING_KEYFILE_BASE64 }}" | base64 --decode - > "$HOME/com.viliussutkus89.samplelib.sampleapp.jks"
-          echo "::set-output name=APP_SIGNING_KEYFILE::$HOME/com.viliussutkus89.samplelib.sampleapp.jks"
-        env:
-          APP_SIGNING_KEYFILE_BASE64: ${{ secrets.APP_SIGNING_KEYFILE_BASE64 }}
+      - run: ./ci-scripts/incrementVersion --release
+        id: preReleaseVersionUpdate
 
-      - name: Build sample app from released library
-        run: ./gradlew build
-        working-directory: sampleapp
-        env:
-          APP_SIGNING_KEYFILE: ${{ steps.decodeKeystore.outputs.APP_SIGNING_KEYFILE }}
-          APP_SIGNING_PASS: ${{ secrets.APP_SIGNING_PASS }}
-          APP_SIGNING_ALIAS: ${{ secrets.APP_SIGNING_ALIAS }}
-
-      - uses: actions/download-artifact@v2
+      - uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          name: maven-local.tar
+          commit_message: "Pre release sample app version update to ${{ steps.preReleaseVersionUpdate.outputs.releasedVersion }}"
+          file_pattern: ${{ steps.preReleaseVersionUpdate.outputs.files }}
+
+      - uses: actions/download-artifacts@v2
+        with:
+          path: artifacts
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag: "v${{ steps.version.outputs.releasedVersion }}"
-          name: "${{ github.event.repository.name }} v${{ steps.version.outputs.releasedVersion }}"
-          artifacts: "maven-local.tar,sampleapp/app/build/outputs/apk/release/*.apk,sampleapp/app/build/reports/*"
+          tag: "v${{ steps.preReleaseVersionUpdate.outputs.releasedVersion }}"
+          name: "${{ github.event.repository.name }} v${{ steps.preReleaseVersionUpdate.outputs.releasedVersion }}"
+          artifacts: "artifacts/maven-local.tar,artifacts/library-lint-results.html,artifacts/instrumentedTestsReport-*-*.tar"
           bodyFile: "UpcomingReleaseNotes.md"
+
+      - run: ./ci-scripts/incrementVersion --patch
+        id: postReleaseVersionIncrement
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "Post release version increment to ${{ steps.version.outputs.unreleasedVersion }} (from ${{ steps.version.outputs.releasedVersion }})"
-          file_pattern: ${{ steps.version.outputs.files }}
+          commit_message: "Post release library version increment to ${{ steps.postReleaseVersionIncrement.outputs.unreleasedVersion }} (from ${{ steps.postReleaseVersionIncrement.outputs.releasedVersion }})"
+          file_pattern: ${{ steps.postReleaseVersionIncrement.outputs.files }}
 
       - run: echo -n > UpcomingReleaseNotes.md
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "Post release truncation of UpcomingReleaseNotes.md"
           file_pattern: UpcomingReleaseNotes.md
+
+  buildSampleApp:
+    environment: SampleAppKeystore
+    needs: releaseGitHub
+    permissions:
+      # Permission needed to attach artifact to GitHub release.
+      contents: write
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          # A branch is required for post release version increment commit
+          ref: refs/tags/${{ needs.releaseGitHub.outputs.RELEASE_TAG }}
+      - uses: actions/setup-java@v2
+        with:
+          distribution: zulu
+          java-version: 8
+      - uses: android-actions/setup-android@v2
+
+      - id: decodeSampleAppKeystore
+        run: |
+          echo "${{ env.APP_SIGNING_KEYFILE_BASE64 }}" | base64 --decode - > "$HOME/com.viliussutkus89.samplelib.sampleapp.jks"
+          echo "::set-output name=APP_SIGNING_KEYFILE::$HOME/com.viliussutkus89.samplelib.sampleapp.jks"
+        env:
+          APP_SIGNING_KEYFILE_BASE64: ${{ secrets.APP_SIGNING_KEYFILE_BASE64 }}
+
+      - run: ./gradlew build
+        working-directory: sampleapp
+        env:
+          APP_SIGNING_KEYFILE: ${{ steps.decodeSampleAppKeystore.outputs.APP_SIGNING_KEYFILE }}
+          APP_SIGNING_PASS: ${{ secrets.APP_SIGNING_PASS }}
+          APP_SIGNING_ALIAS: ${{ secrets.APP_SIGNING_ALIAS }}
+
+      - run: mv sampleapp/app/build/reports/lint-results.html sampleapp-lint-results.html
+
+      - name: Attach sample application to GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ needs.releaseGitHub.outputs.RELEASE_TAG }}
+          allowUpdates: true
+          artifacts: "sampleapp/app/build/outputs/apk/release/*.apk,sampleapp-lint-results.html"

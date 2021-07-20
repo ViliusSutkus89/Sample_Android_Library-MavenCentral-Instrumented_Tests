@@ -46,8 +46,7 @@ permissions:
   statuses: none
 
 jobs:
-  build:
-    environment: BuildUnprivileged
+  buildLibrary:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -71,7 +70,7 @@ jobs:
           path: ~/.m2
 
   buildSampleApp:
-    needs: build
+    needs: buildLibrary
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -104,8 +103,7 @@ jobs:
           path: build/sampleapp-staging/app/build/reports/lint-results.html
 
   runInstrumentedTests:
-    needs: build
-    environment: BuildUnprivileged
+    needs: buildLibrary
     # Only macos VMs are available with exposed CPU extensions to run hardware accelerated emulator
     runs-on: macos-10.15
     strategy:

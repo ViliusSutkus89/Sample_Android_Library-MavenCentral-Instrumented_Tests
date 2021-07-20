@@ -48,6 +48,7 @@ sub usage {
     print STDERR "\tMandatory: major, minor or patch to choose witch version to increment.\n";
     print STDERR "\tOptional: release to updated README.md and other release files.\n";
     print STDERR "\tOptional: requestedVersion, to specify new major, minor or patch number.\n";
+    print STDERR "\trelease and requestedVersion are mutually exclusive.\n";
     exit 1;
 }
 
@@ -65,6 +66,10 @@ if (defined $help) {
 
 if (@ARGV) {
     $requestedVersion = shift;
+}
+
+if (defined $isRelease && defined $requestedVersion) {
+    usage();
 }
 
 my ($major, $minor, $patch_) = $oldVersion =~ /(\d+)\.(\d+)\.(\d+)/;
@@ -87,20 +92,13 @@ else {
     usage();
 }
 
+print "::set-output name=releasedVersion::$oldVersion\n";
+print "::set-output name=releasedVersionCode::$oldVersionCode\n";
+print "::set-output name=unreleasedVersion::$newVersion\n";
+print "::set-output name=unreleasedVersionCode::$newVersionCode\n";
+
 my $rootDirectory = File::Basename::dirname(pathResolver::getAbsolutePath(File::Basename::dirname(__FILE__)));
 my $versionIncrementer = fileUpdater->new({ rootDirectory => $rootDirectory });
-
-$versionIncrementer->update('build.gradle', sub {
-    $_ = shift;
-    s/^(version\s*=\s*['"])${oldVersion}(['"])$/${1}${newVersion}$2/;
-    return $_;
-});
-
-$versionIncrementer->update('lib/build.gradle', sub {
-    $_ = shift;
-    s/^(\s+versionCode\s+)${oldVersionCode}$/${1}${newVersionCode}/;
-    return $_;
-});
 
 if (defined $isRelease) {
     $versionIncrementer->update('sampleapp/app/build.gradle', sub {
@@ -110,15 +108,20 @@ if (defined $isRelease) {
         s/^(\s+implementation\s+['"]com\.viliussutkus89\:samplelib\:)[\d\.]+(['"])$/${1}${oldVersion}${2}/;
         return $_;
     });
-}
 
-print "::set-output name=releasedVersion::$oldVersion\n";
-print "::set-output name=releasedVersionCode::$oldVersionCode\n";
-print "::set-output name=unreleasedVersion::$newVersion\n";
-print "::set-output name=unreleasedVersionCode::$newVersionCode\n";
+    print "::set-output name=files::sampleapp/app/build.gradle\n";
+} else {
+    $versionIncrementer->update('build.gradle', sub {
+        $_ = shift;
+        s/^(version\s*=\s*['"])${oldVersion}(['"])$/${1}${newVersion}$2/;
+        return $_;
+    });
 
-print '::set-output name=files::build.gradle lib/build.gradle';
-if (defined $isRelease) {
-    print ' sampleapp/app/build.gradle';
+    $versionIncrementer->update('lib/build.gradle', sub {
+        $_ = shift;
+        s/^(\s+versionCode\s+)${oldVersionCode}$/${1}${newVersionCode}/;
+        return $_;
+    });
+
+    print "::set-output name=files::build.gradle lib/build.gradle\n";
 }
-print "\n";
