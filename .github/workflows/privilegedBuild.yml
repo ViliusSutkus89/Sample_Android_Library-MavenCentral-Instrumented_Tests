@@ -277,5 +277,6 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ needs.releaseGitHub.outputs.RELEASE_TAG }}
+          name: "${{ github.event.repository.name }} v${{ steps.updateDownstreamVersion.outputs.version }}"
           allowUpdates: true
           artifacts: "sampleapp/app/build/outputs/apk/release/*.apk,sampleapp-lint-results.html"
