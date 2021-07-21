@@ -212,7 +212,7 @@ jobs:
           commit_message: "Pre release sample app version update to ${{ steps.preReleaseVersionUpdate.outputs.releasedVersion }}"
           file_pattern: ${{ steps.preReleaseVersionUpdate.outputs.files }}
 
-      - uses: actions/download-artifacts@v2
+      - uses: actions/download-artifact@v2
         with:
           path: artifacts
 
