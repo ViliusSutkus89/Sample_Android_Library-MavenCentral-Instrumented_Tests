@@ -192,7 +192,7 @@ jobs:
       # Permission needed to create GitHub release and version increment commit.
       contents: write
     outputs:
-      RELEASE_TAG: "v${{ steps.preReleaseVersionUpdate.outputs.releasedVersion }}"
+      RELEASE_TAG: "v${{ steps.updateDownstreamVersion.outputs.version }}"
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -204,13 +204,13 @@ jobs:
         with:
           URLs: ${{ needs.releaseSonatype.outputs.ARTIFACTS }}
 
-      - run: ./ci-scripts/incrementVersion --release
-        id: preReleaseVersionUpdate
+      - run: ./ci-scripts/updateDownstreamVersions
+        id: updateDownstreamVersion
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "Pre release sample app version update to ${{ steps.preReleaseVersionUpdate.outputs.releasedVersion }}"
-          file_pattern: ${{ steps.preReleaseVersionUpdate.outputs.files }}
+          commit_message: "Update README.md and sample app to match versions with to be released library version (${{ steps.updateDownstreamVersion.outputs.version }})"
+          file_pattern: ${{ steps.updateDownstreamVersion.outputs.files }}
 
       - uses: actions/download-artifact@v2
         with:
@@ -220,8 +220,8 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag: "v${{ steps.preReleaseVersionUpdate.outputs.releasedVersion }}"
-          name: "${{ github.event.repository.name }} v${{ steps.preReleaseVersionUpdate.outputs.releasedVersion }}"
+          tag: "v${{ steps.updateDownstreamVersion.outputs.version }}"
+          name: "${{ github.event.repository.name }} v${{ steps.updateDownstreamVersion.outputs.version }}"
           artifacts: "artifacts/maven-local.tar,artifacts/library-lint-results.html,artifacts/instrumentedTestsReport-*-*.tar"
           bodyFile: "UpcomingReleaseNotes.md"
 
@@ -230,7 +230,7 @@ jobs:
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "Post release library version increment to ${{ steps.postReleaseVersionIncrement.outputs.unreleasedVersion }} (from ${{ steps.postReleaseVersionIncrement.outputs.releasedVersion }})"
+          commit_message: "Post release library version increment to ${{ steps.postReleaseVersionIncrement.outputs.newVersion }} (from ${{ steps.postReleaseVersionIncrement.outputs.oldVersion }})"
           file_pattern: ${{ steps.postReleaseVersionIncrement.outputs.files }}
 
       - run: echo -n > UpcomingReleaseNotes.md
@@ -249,7 +249,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          # A branch is required for post release version increment commit
           ref: refs/tags/${{ needs.releaseGitHub.outputs.RELEASE_TAG }}
       - uses: actions/setup-java@v2
         with:

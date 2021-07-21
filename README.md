@@ -248,7 +248,10 @@ Used by CI/CD pipelines to either obtain some information or modify the project.
 Obtains and prints out current project version from [build.gradle](build.gradle).
 
 #### [incrementVersion](ci-scripts/incrementVersion)
-Increments project version and versionCode in various files used by the library and sample application.
+Increments project version and versionCode in library files.
+
+#### [updateDownstreamVersion](ci-scripts/updateDownstreamVersion)
+Updates version and versionCode in downstream files (this README.md, sample application) to match current library version.
 
 #### [prepareLibraryTestsForStagingRepository](ci-scripts/prepareLibraryTestsForStagingRepository)
 Library contains sources and instrumented tests.  
