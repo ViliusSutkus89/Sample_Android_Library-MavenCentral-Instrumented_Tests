@@ -204,7 +204,7 @@ jobs:
         with:
           URLs: ${{ needs.releaseSonatype.outputs.ARTIFACTS }}
 
-      - run: ./ci-scripts/updateDownstreamVersions
+      - run: ./ci-scripts/updateDownstreamVersion
         id: updateDownstreamVersion
 
       - uses: stefanzweifel/git-auto-commit-action@v4
