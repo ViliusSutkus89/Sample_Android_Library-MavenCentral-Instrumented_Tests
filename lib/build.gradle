@@ -41,7 +41,7 @@ dependencies {
     // javadocDependenciesToObtainClasspath 'androidx.annotation:annotation:1.2.0'
 
     //#UNCOMMENT-DURING-STAGING#implementation 'com.viliussutkus89:samplelib:#STAGING-VERSION#'
-    // The line above is used by the scripts/prepareLibraryForStagingRepository
+    // The line above is used by the ci-scripts/prepareLibraryForStagingRepository
 }
 
 task sourceJar(type: Jar) {
