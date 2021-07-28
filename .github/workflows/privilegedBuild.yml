@@ -82,6 +82,7 @@ jobs:
           SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
           SIGNING_PASS: ${{ secrets.SIGNING_PASS }}
 
+      # Tar the maven-local dir, to attach as a single file to GitHub Release
       - run: tar -cvf maven-local.tar ~/.m2
       - uses: actions/upload-artifact@v2
         with:
