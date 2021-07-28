@@ -3,7 +3,7 @@
 #  Copyright (c) 2021 Vilius Sutkus <ViliusSutkus89@gmail.com>
 #
 #  https://github.com/ViliusSutkus89/Sample_Android_Library-MavenCentral-Instrumented_Tests
-#  .github/workflows/privilegedBuild.yml - v1.1.6
+#  .github/workflows/privilegedBuild.yml - v1.1.7
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -89,11 +89,11 @@ jobs:
           name: maven-local.tar
           path: maven-local.tar
 
-      - run: mv lib/build/reports/lint-results.html lib/build/reports/library-lint-results.html
+      - run: mv lib/build/reports/lint-results.html library-lint-report.html
       - uses: actions/upload-artifact@v2
         with:
-          name: library-lint-results.html
-          path: lib/build/reports/library-lint-results.html
+          name: library-lint-report.html
+          path: library-lint-report.html
 
   buildSampleAppStaging:
     needs: buildLibrary
@@ -118,10 +118,11 @@ jobs:
           name: sampleapp-staging-apks
           path: build/sampleapp-staging/app/build/outputs/apk/**/*.apk
 
+      - run: mv build/sampleapp-staging/app/build/reports/lint-results.html sampleapp-staging-lint-report.html
       - uses: actions/upload-artifact@v2
         with:
           name: sampleapp-staging-lint-report.html
-          path: build/sampleapp-staging/app/build/reports/lint-results.html
+          path: sampleapp-staging-lint-report.html
 
   runInstrumentedTests:
     needs: buildLibrary
@@ -223,7 +224,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: "v${{ steps.updateDownstreamVersion.outputs.version }}"
           name: "${{ github.event.repository.name }} v${{ steps.updateDownstreamVersion.outputs.version }}"
-          artifacts: "artifacts/maven-local.tar/maven-local.tar,artifacts/library-lint-results.html/library-lint-results.html,artifacts/instrumentedTestsReport-*-*.tar/instrumentedTestsReport-*-*.tar"
+          artifacts: "artifacts/maven-local.tar/maven-local.tar,artifacts/library-lint-report.html/library-lint-report.html,artifacts/instrumentedTestsReport-*-*.tar/instrumentedTestsReport-*-*.tar"
           bodyFile: "UpcomingReleaseNotes.md"
 
       - run: ./ci-scripts/incrementVersion --patch
@@ -271,7 +272,7 @@ jobs:
           APP_SIGNING_PASS: ${{ secrets.APP_SIGNING_PASS }}
           APP_SIGNING_ALIAS: ${{ secrets.APP_SIGNING_ALIAS }}
 
-      - run: mv sampleapp/app/build/reports/lint-results.html sampleapp-lint-results.html
+      - run: mv sampleapp/app/build/reports/lint-results.html sampleapp-lint-report.html
 
       - name: Attach sample application to GitHub Release
         uses: ncipollo/release-action@v1
@@ -280,4 +281,4 @@ jobs:
           tag: ${{ needs.releaseGitHub.outputs.RELEASE_TAG }}
           name: "${{ github.event.repository.name }} v${{ steps.updateDownstreamVersion.outputs.version }}"
           allowUpdates: true
-          artifacts: "sampleapp/app/build/outputs/apk/**/*.apk,sampleapp-lint-results.html"
+          artifacts: "sampleapp/app/build/outputs/apk/**/*.apk,sampleapp-lint-report.html"
