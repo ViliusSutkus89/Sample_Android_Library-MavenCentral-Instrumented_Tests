@@ -167,7 +167,9 @@ jobs:
           working-directory: build/lib-staging
 
       - run: tar -cvf instrumentedTestsReport-${{ matrix.api-level }}-${{ matrix.arch }}.tar build/lib-staging/lib/build/reports/androidTests/connected
+        if: always()
       - uses: actions/upload-artifact@v2
+        if: always()
         with:
           name: instrumentedTestsReport-${{ matrix.api-level }}-${{ matrix.arch }}.tar
           path: instrumentedTestsReport-${{ matrix.api-level }}-${{ matrix.arch }}.tar
