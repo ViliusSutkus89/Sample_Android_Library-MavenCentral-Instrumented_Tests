@@ -3,7 +3,7 @@ The purpose of this project is to provide a sample library with a particular set
 [![Maven Central](https://img.shields.io/maven-central/v/com.viliussutkus89/samplelib.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:com.viliussutkus89%20AND%20a:samplelib)  
 ```gradle
 dependencies {
-    implementation 'com.viliussutkus89:samplelib:1.1.7'
+    implementation 'com.viliussutkus89:samplelib:1.1.8'
 }
 ```
 
