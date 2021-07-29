@@ -61,6 +61,12 @@ jobs:
 
       - run: ./gradlew build lintRelease
 
+      - run: mv lib/build/reports/lint-results-release.html library-lint-report.html
+      - uses: actions/upload-artifact@v2
+        with:
+          name: library-lint-report.html
+          path: library-lint-report.html
+
       - name: 'Publish to Sonatype'
         run: ./gradlew publishToSonatype closeSonatypeStagingRepository | tee publishToSonatype.log
         # bash has pipefail on by default, which is needed for tee to fail, if gradle fails
@@ -88,12 +94,6 @@ jobs:
         with:
           name: maven-local.tar
           path: maven-local.tar
-
-      - run: mv lib/build/reports/lint-results-release.html library-lint-report.html
-      - uses: actions/upload-artifact@v2
-        with:
-          name: library-lint-report.html
-          path: library-lint-report.html
 
   buildSampleAppStaging:
     needs: buildLibrary
