@@ -15,55 +15,61 @@ Project contains an Android [library](lib) with [instrumented tests](lib/src/and
 Library is built on GitHub Actions pipeline.  
 Each successful build is published to a new staging repository in MavenCentral (Additional keywords: OSSRH, Nexus, Sonatype).
 Publishing is done using [publish-plugin](https://github.com/gradle-nexus/publish-plugin).  
-Instrumented tests are run against the previously deployed library on a matrix of emulated devices, also in the GitHub Actions pipeline.  
-Build, which passes instrumented tests, can be promoted to production.  
-Promotion to production means promoting the build to MavenCentral and creating a new GitHub release.
+Instrumented tests are run on a matrix of emulated devices against the previously deployed library.
 
-## Drawbacks
-
-No build badge - badge status updates only when the whole workflow finishes. Either failed or succeeded.  
-Current implementation has only two types of finished workflows: failed builds and released build.  
-This means that after a build break, the badge will stay red until a new release, not until a passing build.
+Build is released using `release.yml` manual workflow.  
+Release implies promoting staging repository to MavenCentral and creating a new GitHub release.
 
 ## Workflows
 
 #### [privilegedBuild.yml](.github/workflows/privilegedBuild.yml)
 Triggered either by push to main/master branch or manually (`workflow_dispatch`).  
-Composed of six jobs:
+Composed of three jobs:
 1) buildLibrary:
    1) Compiles the library and signs it with a private key. 
    1) Deploys build artifacts to a Sonatype staging repository.
-   1) Deploys build artifacts to MavenLocal (~/.m2) and saves ~/.m2 as maven-local.tar, to be included in GitHub release.
-   1) Saves lint results as library-lint-results.html, to be included in GitHub release.
+   1) Deploys build artifacts to MavenLocal (~/.m2).
+   1) Artifacts MavenLocal.
+   1) Artifacts lint report.
 1) buildSampleAppStaging (depends on buildLibrary):
    1) Builds sample application against the library deployed to Sonatype staging repository.
    1) Artifacts APKs as sampleapp-staging-apks. Will not be attached to GitHub release.
-   1) Artifacts lint report as sampleapp-staging-lint-report.html. Will not be attached to GitHub release.
+   1) Artifacts lint report.
 1) runInstrumentedTests (depends on buildLibrary):
    1) Runs instrumented tests on a matrix of emulated Android devices against the library deployed to Sonatype staging repository.
-   1) Artifacts test report as instrumentedTestsReport-${{ matrix.api-level }}-${{ matrix.arch }}.tar, to be included in GitHub release.
-1) releaseSonatype (depends on buildLibrary and runInstrumentedTests):
+   1) Artifacts test reports.
+
+#### [release.yml](.github/workflows/release.yml)
+Triggered manually (`workflow_dispatch`).  
+Requires input variable `STAGING_REPO_URL`, which is printed as a warning in
+`buildLibrary` build job of `privilegedBuild.yml` workflow.  
+Composed of three jobs:
+1) releaseSonatype:  
    Promotes the Sonatype staging repository to MavenCentral.
 1) releaseGitHub (depends on releaseSonatype):
    1) Waits for release to propagate to MavenCentral.
    1) Updates sample application version.
-   1) Creates GitHub release.
+   1) Creates a GitHub release.
    1) Increments library version.
-1) buildSampleApp (depends on releaseGitHub):  
+1) buildSampleApp (depends on releaseGitHub):
    1) Builds sample application against the released library.
    1) Attaches APKs and lint-results.html to GitHub release.
 
 #### [unprivilegedBuild.yml](.github/workflows/unprivilegedBuild.yml)
 Triggered either by push to branch other than main/master or manually (`workflow_dispatch`).  
 Composed of three jobs:
-1) buildLibrary. Builds the library and deploys to MavenLocal (~/.m2).
+1) buildLibrary:
+   1) Compiles the library.
+   1) Deploys build artifacts to MavenLocal (~/.m2).
+   1) Artifacts MavenLocal.
+   1) Artifacts lint report.
 1) buildSampleApp. Depends on buildLibrary.  
    1) Builds the sample application against the library deployed to a staging repository in MavenLocal (~/.m2).
-   1) Artifacts APKs as sampleapp-staging-apks.
-   1) Artifacts lint report as sampleapp-staging-lint-report.html.
+   1) Artifacts APKs.
+   1) Artifacts lint report.
 1) runInstrumentedTests. Depends on buildLibrary.  
    1) Runs instrumented tests on a matrix of emulated Android devices against the library deployed to a staging repository in MavenLocal (~/.m2).
-   1) Artifacts test report as instrumentedTestsReport-${{ matrix.api-level }}-${{ matrix.arch }}.tar.
+   1) Artifacts test reports.
 
 #### [manualVersionIncrement_{major,minor,patch}.yml](.github/workflows/manualVersionIncrement_major.yml)
 Triggered only manually (`workflow_dispatch`).  
