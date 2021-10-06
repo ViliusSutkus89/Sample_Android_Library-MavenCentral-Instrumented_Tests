@@ -5,7 +5,7 @@ The purpose of this project is to provide a sample library with a particular set
 
 ```gradle
 dependencies {
-    implementation 'com.viliussutkus89:samplelib:1.1.8'
+    implementation 'com.viliussutkus89:samplelib:1.2.0'
 }
 ```
 
