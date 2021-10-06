@@ -77,21 +77,17 @@ Used to increment project version and commit changes to source control.
 
 ## Environments
 
-Following environments are used only in privilegedBuild workflow.
-
-#### LibraryKeyAndSonatypeAccess - (buildLibrary job)
+#### LibraryKeyAndSonatypeAccess - (privilegedBuild workflow, buildLibrary job)
 Environment contains the following secrets:  
 `SIGNING_KEY`, `SIGNING_PASS` - ASCII armored private key and password used for signing library artifacts.  
 `SONATYPE_USERNAME`, `SONATYPE_PASSWORD` - User token (not the actual login to oss.sonatype.org), obtained through oss.sonatype.org -> Profile -> User Token.
 
-#### SonatypeAccess - (releaseSonatype job)
-Has manual review protection rule, which is used to gate builds.  
+#### SonatypeAccess - (release workflow, releaseSonatype job)
 Environment contains the following secrets:   
 `SONATYPE_USERNAME`, `SONATYPE_PASSWORD` - User token (not the actual login to oss.sonatype.org), obtained through oss.sonatype.org -> Profile -> User Token.
 
-#### TenMinuteWait - (releaseGitHub job)
-Used by the releaseGitHub job.
-Has a timed gate, to ensure Sonatype release propagation to MavenCentral.
+#### TenMinuteWait - (release workflow, releaseGitHub job)
+A timed gate. Release propagation to MavenCentral takes over ten minutes. Timed gate waits a set amount of time without having a build job running.
 
 #### SampleAppKeystore - (buildSampleApp job)
 Environment contains the following secrets:  
