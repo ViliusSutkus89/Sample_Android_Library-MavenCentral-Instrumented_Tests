@@ -59,7 +59,7 @@ my $oldVersion = getVersion::getVersion();
 my $oldVersionCode = getVersion::getVersionCode();
 my ($newVersion, $newVersionCode);
 
-my ($upMajor, $upMinor, $upPatch, $help, $requestedVersion, $requestedVersionCode);
+my ($upMajor, $upMinor, $upPatch, $help);
 Getopt::Long::GetOptions(major => \$upMajor, minor => \$upMinor, patch => \$upPatch, 'help' => \$help) or usage;
 if (defined $help) {
     usage();
