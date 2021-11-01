@@ -57,8 +57,8 @@ sub usage {
 my ($rootDirectory, $appProjectName, $help);
 my $repository = 'mavenLocal';
 my $outputDirectory = 'build/staging-app';
-my $version = getVersion();
-my $appVersion = $version . '-STAGING';
+my $libVersion = getVersion::getVersion();
+my $appVersion = getVersion::getAppVersion() . '-STAGING';
 
 Getopt::Long::GetOptions('repository=s' => \$repository, 'output=s' => \$outputDirectory, 'help' => \$help) or usage;
 if (defined $help) {
@@ -108,6 +108,6 @@ $sampleAppStaging->update($appProjectName, undef, sub {
 $sampleAppStaging->update("$appProjectName/build.gradle", sub {
     $_ = shift;
     s/(versionName\s+["']).+(["'])/${1}${appVersion}${2}/;
-    s/(implementation\s+["']com\.viliussutkus89:samplelib:).+(["'])/${1}${version}${2}/;
+    s/(implementation\s+["']com\.viliussutkus89:samplelib:).+(["'])/${1}${libVersion}${2}/;
     return $_;
 });

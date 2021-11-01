@@ -58,15 +58,19 @@ $versionUpdater->update('README.md', sub {
     return $_;
 });
 
+# Library is versioned as "MAJOR.MINOR.PATCH"
+# Application is versioned as "LIBRARY_MAJOR.LIBRARY_MINOR.LIBRARY_PATCH.APPLICATION_BUILD_NUMBER"
 $versionUpdater->update('sampleapp/app/build.gradle', sub {
     $_ = shift;
-    # Update versionName and versionCode of sample application to have the same version as the library.
-    # Purely for semantic reasons.
-    s/^(\s+versionName\s+['"])[\d\.]+(['"])$/${1}${version}${2}/;
-    s/^(\s+versionCode\s+)\d+$/${1}${versionCode}/;
-
     # Update the version of library, which this sample application depends on.
     s/^(\s+implementation\s+['"]com\.viliussutkus89\:samplelib\:)[\d\.]+(['"])$/${1}${version}${2}/;
+
+    # Update versionName of sample application to be the same as the library, but with ".0" at the end.
+    s/^(\s+versionName\s+['"])[\d\.]+(['"])$/${1}${version}.0${2}/;
+
+    # Update versionCode of sample application to be the same as the library.
+    s/^(\s+versionCode\s+)\d+$/${1}${versionCode}/;
+
     return $_;
 });
 

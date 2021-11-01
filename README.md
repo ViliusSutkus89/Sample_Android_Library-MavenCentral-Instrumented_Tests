@@ -17,8 +17,9 @@ Each successful build is published to a new staging repository in MavenCentral (
 Publishing is done using [publish-plugin](https://github.com/gradle-nexus/publish-plugin).  
 Instrumented tests are run on a matrix of emulated devices against the previously deployed library.
 
-Build is released using `release.yml` manual workflow.  
-Release implies promoting staging repository to MavenCentral and creating a new GitHub release.
+Build is released using `fullRelease.yml` or `appRelease.yml` manual workflow.  
+Release implies promoting staging repository to MavenCentral and creating a new GitHub release.  
+FullRelease releases both library and application. AppRelease only releases the application.
 
 ## Workflows
 
@@ -39,7 +40,7 @@ Composed of three jobs:
    1) Runs instrumented tests on a matrix of emulated Android devices against the library deployed to Sonatype staging repository.
    1) Artifacts test reports.
 
-#### [release.yml](.github/workflows/release.yml)
+#### [fullRelease.yml](.github/workflows/fullRelease.yml)
 Triggered manually (`workflow_dispatch`).  
 Requires input variable `STAGING_REPO_URL`, which is printed as a warning in
 `buildLibrary` build job of `privilegedBuild.yml` workflow.  
@@ -54,6 +55,18 @@ Composed of three jobs:
 1) buildSampleApp (depends on releaseGitHub):
    1) Builds sample application against the released library.
    1) Attaches APKs and lint-results.html to GitHub release.
+
+#### [appRelease.yml](.github/workflows/appRelease.yml)
+Triggered manually (`workflow_dispatch`).
+
+Composed of two jobs:
+1) buildSampleApp:
+   1) Builds sample application against the released library.
+   2) Artifacts APKs and lint-results.html.
+1) releaseGitHub (depends on buildSampleApp):
+   1) Creates a GitHub release.
+   1) Attaches artifacted APKs and lint-results.html to GitHub release.
+   1) Increments sample application version.
 
 #### [unprivilegedBuild.yml](.github/workflows/unprivilegedBuild.yml)
 Triggered either by push to branch other than main/master or manually (`workflow_dispatch`).  
@@ -82,14 +95,14 @@ Environment contains the following secrets:
 `SIGNING_KEY`, `SIGNING_PASS` - ASCII armored private key and password used for signing library artifacts.  
 `SONATYPE_USERNAME`, `SONATYPE_PASSWORD` - User token (not the actual login to oss.sonatype.org), obtained through oss.sonatype.org -> Profile -> User Token.
 
-#### SonatypeAccess - (release workflow, releaseSonatype job)
+#### SonatypeAccess - (fullRelease workflow, releaseSonatype job)
 Environment contains the following secrets:   
 `SONATYPE_USERNAME`, `SONATYPE_PASSWORD` - User token (not the actual login to oss.sonatype.org), obtained through oss.sonatype.org -> Profile -> User Token.
 
-#### TenMinuteWait - (release workflow, releaseGitHub job)
+#### TenMinuteWait - (fullRelease workflow, releaseGitHub job)
 A timed gate. Release propagation to MavenCentral takes over ten minutes. Timed gate waits a set amount of time without having a build job running.
 
-#### SampleAppKeystore - (buildSampleApp job)
+#### SampleAppKeystore - (fullRelease and appRelease workflows, buildSampleApp job)
 Environment contains the following secrets:  
 `APP_SIGNING_KEYFILE_BASE64`, `APP_SIGNING_PASS`, `APP_SIGNING_ALIAS` - keystore used for sample application signing.
 
