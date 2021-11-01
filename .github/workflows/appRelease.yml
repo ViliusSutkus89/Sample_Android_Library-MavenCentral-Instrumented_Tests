@@ -93,13 +93,13 @@ jobs:
           # A branch is required for post release version increment commit
           ref: ${{ needs.buildSampleApp.outputs.GIT_TAG }}
 
-#      - run: actions/download-artifact@v2
-#        with:
-#          path: artifacts
-#
-#      - run: ./ci-scripts/getVersion --application
-#        id: version
-#
+      - run: actions/download-artifact@v2
+        with:
+          path: artifacts
+
+      - run: ./ci-scripts/getVersion --application
+        id: version
+
 #      - name: Create GitHub Release
 #        uses: ncipollo/release-action@v1
 #        with:
@@ -107,10 +107,10 @@ jobs:
 #          tag: "appRelease-v${{ steps.updateDownstreamVersion.outputs.version }}"
 #          name: "[AppRelease] ${{ github.event.repository.name }} v${{ steps.version.outputs.applicationVersion }}"
 #          artifacts: "artifacts/APKs/*.apk,artifacts/sampleapp-lint-report.html/sampleapp-lint-report.html"
-#
-#      - run: ./ci-scripts/incrementVersion --application
-#        id: postReleaseVersionIncrement
-#
+
+      - run: ./ci-scripts/incrementVersion --application
+        id: postReleaseVersionIncrement
+
 #      - uses: stefanzweifel/git-auto-commit-action@v4
 #        with:
 #          commit_message: "Post release app version increment to ${{ steps.postReleaseVersionIncrement.outputs.newAppVersion }} (from ${{ steps.postReleaseVersionIncrement.outputs.oldAppVersion }})"
