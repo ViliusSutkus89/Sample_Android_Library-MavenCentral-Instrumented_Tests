@@ -105,8 +105,8 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag: "v${{ steps.updateDownstreamVersion.outputs.version }}"
-          name: "[AppOnlyRelease] ${{ github.event.repository.name }} v${{ steps.version.outputs.applicationVersion }}"
+          tag: "appRelease-v${{ steps.updateDownstreamVersion.outputs.version }}"
+          name: "[AppRelease] ${{ github.event.repository.name }} v${{ steps.version.outputs.applicationVersion }}"
           artifacts: "artifacts/APKs/*.apk,artifacts/sampleapp-lint-report.html/sampleapp-lint-report.html"
 
       - run: ./ci-scripts/incrementVersion --application
