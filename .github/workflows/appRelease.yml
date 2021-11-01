@@ -42,6 +42,9 @@ jobs:
   buildSampleApp:
     environment: SampleAppKeystore
     runs-on: ubuntu-20.04
+    outputs:
+      # in case there's a commit between buildSampleApp and releaseApp jobs...
+      GIT_TAG: ${{ github.event.ref }}
     steps:
       - uses: actions/checkout@v2
         with:
