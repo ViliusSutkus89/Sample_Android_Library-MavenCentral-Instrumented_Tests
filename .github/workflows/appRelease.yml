@@ -24,7 +24,17 @@
 #  SOFTWARE.
 
 name: appRelease
-on: workflow_dispatch
+#@TODO: This is temporary, for auto pipeline triggger
+#on: workflow_dispatch
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master, main ]
+    paths-ignore:
+      - '**.md'
+      - '.github/**'
+      - '!.github/workflows/appRelease.yml'
+#@TODO: This is temporary, for auto pipeline triggger
 
 permissions:
   actions: none
@@ -97,16 +107,22 @@ jobs:
         with:
           path: artifacts
 
-      - run: ./ci-scripts/getVersion --application
+#      TEMPORARY
+      - run: ls -lha artifacts
+
+      - run: ./ci-scripts/getVersion --ci
         id: version
+
+#      TEMPORARY
+      - run: echo "appRelease-v${{ steps.version.outputs.appVersion }}"
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag: "appRelease-v${{ steps.updateDownstreamVersion.outputs.version }}"
-          name: "[AppRelease] ${{ github.event.repository.name }} v${{ steps.version.outputs.applicationVersion }}"
-          artifacts: "artifacts/APKs/*.apk,artifacts/sampleapp-lint-report.html/sampleapp-lint-report.html"
+          tag: "appRelease-v${{ steps.version.outputs.appVersion }}"
+          name: "[AppRelease] ${{ github.event.repository.name }} v${{ steps.version.outputs.appVersion }}"
+          artifacts: "artifacts/APKs/**.apk,artifacts/sampleapp-lint-report.html/sampleapp-lint-report.html"
 
       - run: ./ci-scripts/incrementVersion --application
         id: postReleaseVersionIncrement
