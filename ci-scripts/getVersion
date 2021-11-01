@@ -4,7 +4,7 @@
 #  Copyright (c) 2021 Vilius Sutkus <ViliusSutkus89@gmail.com>
 #
 #  https://github.com/ViliusSutkus89/Sample_Android_Library-MavenCentral-Instrumented_Tests
-#  ci-scripts/getVersion - v1.3.1
+#  ci-scripts/getVersion - v1.4.0
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@ use strict;
 use warnings;
 
 use base 'Exporter';
-our $VERSION = '1.3.0';
+our $VERSION = '1.4.0';
 our @EXPORT = qw(getVersion);
 our @EXPORT_OK = qw(getVersionCode getAppVersion getAppVersionCode);
 
