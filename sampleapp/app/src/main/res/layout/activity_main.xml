@@ -12,9 +12,24 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="App version: " />
+            android:text="App versionName: " />
         <TextView
-            android:id="@+id/appVersion"
+            android:id="@+id/appVersionName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="[PLACEHOLDER]" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="App versionCode: " />
+        <TextView
+            android:id="@+id/appVersionCode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="[PLACEHOLDER]" />
@@ -42,9 +57,24 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Library version: " />
+            android:text="Library versionName: " />
         <TextView
-            android:id="@+id/libVersion"
+            android:id="@+id/libVersionName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="[PLACEHOLDER]" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Library versionCode: " />
+        <TextView
+            android:id="@+id/libVersionCode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="[PLACEHOLDER]" />

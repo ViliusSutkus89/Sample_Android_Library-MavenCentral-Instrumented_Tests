@@ -12,17 +12,13 @@ public class MainActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
-    TextView appVersion = findViewById(R.id.appVersion);
-    appVersion.setText("Code=" + BuildConfig.VERSION_CODE + ", name=" + BuildConfig.VERSION_NAME);
+    ((TextView)findViewById(R.id.appVersionName)).setText(BuildConfig.VERSION_NAME);
+    ((TextView)findViewById(R.id.appVersionCode)).setText(String.valueOf(BuildConfig.VERSION_CODE));
+    ((TextView)findViewById(R.id.appGitCommit)).setText(R.string.GIT_COMMMIT);
 
-    TextView appGitCommit = findViewById(R.id.appGitCommit);
-    appGitCommit.setText(R.string.GIT_COMMMIT);
-
-    TextView libVersion = findViewById(R.id.libVersion);
-    libVersion.setText(VersionGetter.getVersion());
-
-    TextView libGitCommit = findViewById(R.id.libGitCommit);
-    libGitCommit.setText(VersionGetter.getGitCommit());
+    ((TextView)findViewById(R.id.libVersionName)).setText(VersionGetter.getVersionName());
+    ((TextView)findViewById(R.id.libVersionCode)).setText(String.valueOf(VersionGetter.getVersionCode()));
+    ((TextView)findViewById(R.id.libGitCommit)).setText(VersionGetter.getGitCommit());
   }
 
 }
