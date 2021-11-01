@@ -12,7 +12,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="App versionName: " />
+            android:text="@string/app_versionname" />
         <TextView
             android:id="@+id/appVersionName"
             android:layout_width="wrap_content"
@@ -26,7 +26,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="App versionCode: " />
+            android:text="@string/app_versioncode" />
         <TextView
             android:id="@+id/appVersionCode"
             android:layout_width="wrap_content"
@@ -40,7 +40,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="App git commit: " />
+            android:text="@string/app_git_commit" />
         <TextView
             android:id="@+id/appGitCommit"
             android:layout_width="wrap_content"
@@ -54,7 +54,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Library versionName: " />
+            android:text="@string/library_versionname" />
         <TextView
             android:id="@+id/libVersionName"
             android:layout_width="wrap_content"
@@ -68,7 +68,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Library versionCode: " />
+            android:text="@string/library_versioncode" />
         <TextView
             android:id="@+id/libVersionCode"
             android:layout_width="wrap_content"
@@ -82,7 +82,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Library git commit: " />
+            android:text="@string/library_git_commit" />
         <TextView
             android:id="@+id/libGitCommit"
             android:layout_width="wrap_content"

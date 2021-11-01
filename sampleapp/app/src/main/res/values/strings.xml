@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">sample app for sample library</string>
+    <string name="app_versionname">"App versionName: "</string>
+    <string name="app_versioncode">"App versionCode: "</string>
+    <string name="app_git_commit">"App git commit: "</string>
+    <string name="library_versionname">"Library versionName: "</string>
+    <string name="library_versioncode">"Library versionCode: "</string>
+    <string name="library_git_commit">"Library git commit: "</string>
 </resources>
