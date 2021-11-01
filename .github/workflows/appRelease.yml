@@ -24,17 +24,7 @@
 #  SOFTWARE.
 
 name: appRelease
-#@TODO: This is temporary, for auto pipeline triggger
-#on: workflow_dispatch
-on:
-  workflow_dispatch:
-  push:
-    branches: [ master, main ]
-    paths-ignore:
-      - '**.md'
-      - '.github/**'
-      - '!.github/workflows/appRelease.yml'
-#@TODO: This is temporary, for auto pipeline triggger
+on: workflow_dispatch
 
 permissions:
   actions: none
