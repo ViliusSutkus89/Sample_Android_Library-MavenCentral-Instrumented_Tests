@@ -16,8 +16,7 @@
         <TextView
             android:id="@+id/appVersionName"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="[PLACEHOLDER]" />
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
     <LinearLayout
@@ -31,8 +30,7 @@
         <TextView
             android:id="@+id/appVersionCode"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="[PLACEHOLDER]" />
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
     <LinearLayout
@@ -46,8 +44,7 @@
         <TextView
             android:id="@+id/appGitCommit"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="[PLACEHOLDER]" />
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
     <LinearLayout
@@ -61,8 +58,7 @@
         <TextView
             android:id="@+id/libVersionName"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="[PLACEHOLDER]" />
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
     <LinearLayout
@@ -76,8 +72,7 @@
         <TextView
             android:id="@+id/libVersionCode"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="[PLACEHOLDER]" />
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
     <LinearLayout
@@ -91,8 +86,7 @@
         <TextView
             android:id="@+id/libGitCommit"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="[PLACEHOLDER]" />
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
 </LinearLayout>
