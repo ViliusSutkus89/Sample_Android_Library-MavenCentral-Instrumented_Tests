@@ -42,9 +42,9 @@ jobs:
   buildSampleApp:
     environment: SampleAppKeystore
     runs-on: ubuntu-20.04
-    outputs:
+#    outputs:
       # in case there's a commit between buildSampleApp and releaseApp jobs...
-      GIT_TAG: ${{ github.event.ref }}
+#      GIT_TAG: ${{ github.event.ref }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -92,7 +92,8 @@ jobs:
       - uses: actions/checkout@v2
         with:
           # A branch is required for post release version increment commit
-          ref: ${{ needs.buildSampleApp.outputs.GIT_TAG }}
+#          ref: ${{ needs.buildSampleApp.outputs.GIT_TAG }}
+          ref: ${{ github.event.ref }}
 
       - run: actions/download-artifact@v2
         with:
