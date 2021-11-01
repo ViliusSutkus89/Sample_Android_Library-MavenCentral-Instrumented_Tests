@@ -104,9 +104,9 @@ jobs:
           # A branch is required for post release version increment commit
           ref: ${{ needs.buildSampleApp.outputs.GIT_TAG }}
 
-#      - run: actions/download-artifact@v2
-#        with:
-#          path: artifacts
+      - run: actions/download-artifact@v2
+        with:
+          path: artifacts
 
 #      - run: ./ci-scripts/getVersion --application
 #        id: version
