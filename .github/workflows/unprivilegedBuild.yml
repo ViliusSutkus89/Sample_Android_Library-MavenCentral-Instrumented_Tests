@@ -3,7 +3,7 @@
 #  Copyright (c) 2021 Vilius Sutkus <ViliusSutkus89@gmail.com>
 #
 #  https://github.com/ViliusSutkus89/Sample_Android_Library-MavenCentral-Instrumented_Tests
-#  .github/workflows/unprivilegedBuild.yml - v1.1.9
+#  .github/workflows/unprivilegedBuild.yml - v1.4.0
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -47,6 +47,7 @@ permissions:
 
 jobs:
   buildLibrary:
+    if: "!contains(github.event.head_commit.message, '[AppOnly]')"
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -69,40 +70,6 @@ jobs:
         with:
           name: maven-local
           path: ~/.m2
-
-  buildSampleApp:
-    needs: buildLibrary
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-java@v2
-        with:
-          distribution: zulu
-          java-version: 11
-      - uses: android-actions/setup-android@v2
-
-      - uses: actions/download-artifact@v2
-        with:
-          name: maven-local
-          path: ~/.m2
-
-      - name: Prepare sample app for staging repository
-        run: ./ci-scripts/prepareSampleAppForStagingRepository sampleapp app --output=build/sampleapp-staging --repository=mavenLocal
-
-      - name: Build and lint sample app from staging library
-        run: ./gradlew build lintRelease
-        working-directory: build/sampleapp-staging
-
-      - uses: actions/upload-artifact@v2
-        with:
-          name: sampleapp-staging-apks
-          path: build/sampleapp-staging/app/build/outputs/apk/**/*.apk
-
-      - run: mv build/sampleapp-staging/app/build/reports/lint-results-release.html sampleapp-lint-report.html
-      - uses: actions/upload-artifact@v2
-        with:
-          name: sampleapp-lint-report.html
-          path: sampleapp-lint-report.html
 
   runInstrumentedTests:
     needs: buildLibrary
@@ -159,3 +126,62 @@ jobs:
         with:
           name: instrumentedTestsReport-${{ matrix.api-level }}-${{ matrix.arch }}.tar
           path: instrumentedTestsReport-${{ matrix.api-level }}-${{ matrix.arch }}.tar
+
+  buildSampleAppAgainstUnreleasedLibrary:
+    needs: buildLibrary
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v2
+        with:
+          distribution: zulu
+          java-version: 11
+      - uses: android-actions/setup-android@v2
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: maven-local
+          path: ~/.m2
+
+      - name: Prepare sample app for staging repository
+        run: ./ci-scripts/prepareSampleAppForStagingRepository sampleapp app --output=build/sampleapp-staging --repository=mavenLocal
+
+      - name: Build and lint sample app from staging library
+        run: ./gradlew build lintRelease
+        working-directory: build/sampleapp-staging
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: APKs
+          path: build/sampleapp-staging/app/build/outputs/apk/**/*.apk
+
+      - run: mv build/sampleapp-staging/app/build/reports/lint-results-release.html sampleapp-lint-report.html
+      - uses: actions/upload-artifact@v2
+        with:
+          name: sampleapp-lint-report.html
+          path: sampleapp-lint-report.html
+
+  buildSampleAppAgainstReleasedLibrary:
+    if: "contains(github.event.head_commit.message, '[AppOnly]')"
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v2
+        with:
+          distribution: zulu
+          java-version: 11
+      - uses: android-actions/setup-android@v2
+
+      - run: ./gradlew build lintRelease
+        working-directory: sampleapp
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: APKs
+          path: sampleapp/app/build/outputs/apk/**/*.apk
+
+      - run: mv sampleapp/app/build/reports/lint-results-release.html sampleapp-lint-report.html
+      - uses: actions/upload-artifact@v2
+        with:
+          name: sampleapp-lint-report.html
+          path: sampleapp-lint-report.html
