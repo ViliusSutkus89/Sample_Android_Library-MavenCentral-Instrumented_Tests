@@ -4,7 +4,7 @@
 #  Copyright (c) 2021 Vilius Sutkus <ViliusSutkus89@gmail.com>
 #
 #  https://github.com/ViliusSutkus89/Sample_Android_Library-MavenCentral-Instrumented_Tests
-#  ci-scripts/getVersion - v1.3.0
+#  ci-scripts/getVersion - v1.3.1
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -85,9 +85,16 @@ sub getAppVersionCode {
 }
 
 if (not caller()) {
-    my $application;
-    Getopt::Long::GetOptions(application => \$application);
-    if (defined $application) {
+    my ($application, $ci);
+    Getopt::Long::GetOptions(application => \$application, ci => \$ci);
+    if (defined $ci) {
+        print "::set-output name=version::", getVersion(), "\n";
+        print "::set-output name=versionCode::", getVersionCode(), "\n";
+
+        print "::set-output name=appVersion::", getAppVersion(), "\n";
+        print "::set-output name=appVersionCode:", getAppVersionCode(), "\n";
+    }
+    elsif (defined $application) {
         print getAppVersion(), "\n";
     } else {
         print getVersion(), "\n";
