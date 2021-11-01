@@ -108,13 +108,10 @@ jobs:
           path: artifacts
 
 #      TEMPORARY
-      - run: ls -lha artifacts
+      - run: ls -lhaR artifacts
 
       - run: ./ci-scripts/getVersion --ci
         id: version
-
-#      TEMPORARY
-      - run: echo "appRelease-v${{ steps.version.outputs.appVersion }}"
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
