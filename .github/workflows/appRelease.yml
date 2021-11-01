@@ -84,7 +84,7 @@ jobs:
   releaseApp:
     needs: buildSampleApp
     permissions:
-      # Permission needed to attach artifact to GitHub release.
+      # Permission needed to create the GitHub release.
       contents: write
     runs-on: ubuntu-20.04
     steps:
@@ -93,25 +93,25 @@ jobs:
           # A branch is required for post release version increment commit
           ref: ${{ needs.buildSampleApp.outputs.GIT_TAG }}
 
-      - run: actions/download-artifact@v2
-        with:
-          path: artifacts
-
-      - run: ./ci-scripts/getVersion --application
-        id: version
-
-      - name: Create GitHub Release
-        uses: ncipollo/release-action@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag: "appRelease-v${{ steps.updateDownstreamVersion.outputs.version }}"
-          name: "[AppRelease] ${{ github.event.repository.name }} v${{ steps.version.outputs.applicationVersion }}"
-          artifacts: "artifacts/APKs/*.apk,artifacts/sampleapp-lint-report.html/sampleapp-lint-report.html"
-
-      - run: ./ci-scripts/incrementVersion --application
-        id: postReleaseVersionIncrement
-
-      - uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: "Post release app version increment to ${{ steps.postReleaseVersionIncrement.outputs.newAppVersion }} (from ${{ steps.postReleaseVersionIncrement.outputs.oldAppVersion }})"
-          file_pattern: ${{ steps.postReleaseVersionIncrement.outputs.files }}
+#      - run: actions/download-artifact@v2
+#        with:
+#          path: artifacts
+#
+#      - run: ./ci-scripts/getVersion --application
+#        id: version
+#
+#      - name: Create GitHub Release
+#        uses: ncipollo/release-action@v1
+#        with:
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          tag: "appRelease-v${{ steps.updateDownstreamVersion.outputs.version }}"
+#          name: "[AppRelease] ${{ github.event.repository.name }} v${{ steps.version.outputs.applicationVersion }}"
+#          artifacts: "artifacts/APKs/*.apk,artifacts/sampleapp-lint-report.html/sampleapp-lint-report.html"
+#
+#      - run: ./ci-scripts/incrementVersion --application
+#        id: postReleaseVersionIncrement
+#
+#      - uses: stefanzweifel/git-auto-commit-action@v4
+#        with:
+#          commit_message: "Post release app version increment to ${{ steps.postReleaseVersionIncrement.outputs.newAppVersion }} (from ${{ steps.postReleaseVersionIncrement.outputs.oldAppVersion }})"
+#          file_pattern: ${{ steps.postReleaseVersionIncrement.outputs.files }}
