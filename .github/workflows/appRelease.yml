@@ -3,7 +3,7 @@
 #  Copyright (c) 2021 Vilius Sutkus <ViliusSutkus89@gmail.com>
 #
 #  https://github.com/ViliusSutkus89/Sample_Android_Library-MavenCentral-Instrumented_Tests
-#  .github/workflows/appRelease.yml - v1.3.0
+#  .github/workflows/appRelease.yml - v1.4.1
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -104,7 +104,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag: "appRelease-v${{ steps.version.outputs.appVersion }}"
+          tag: "v${{ steps.version.outputs.appVersion }}-AppRelease"
           name: "[AppRelease] ${{ github.event.repository.name }} v${{ steps.version.outputs.appVersion }}"
           artifacts: "artifacts/APKs/**/*.apk,artifacts/sampleapp-lint-report.html/sampleapp-lint-report.html"
 
