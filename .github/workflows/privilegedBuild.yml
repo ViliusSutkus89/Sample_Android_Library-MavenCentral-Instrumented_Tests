@@ -180,12 +180,14 @@ jobs:
         with:
           name: APKs
           path: build/sampleapp-staging/app/build/outputs/apk/**/*.apk
+          if-no-files-found: error
 
       - run: mv build/sampleapp-staging/app/build/reports/lint-results-release.html sampleapp-staging-lint-report.html
       - uses: actions/upload-artifact@v2
         with:
           name: sampleapp-staging-lint-report.html
           path: sampleapp-staging-lint-report.html
+          if-no-files-found: error
 
   buildSampleAppAgainstReleasedLibrary:
     if: "!contains(github.event.head_commit.message, '[SkipCI]') && contains(github.event.head_commit.message, '[AppOnly]')"
