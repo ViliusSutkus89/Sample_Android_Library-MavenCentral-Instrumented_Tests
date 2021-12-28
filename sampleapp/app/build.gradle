@@ -1,12 +1,11 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 31
-    buildToolsVersion "31.0.0"
+    compileSdkVersion 32
     defaultConfig {
         applicationId "com.viliussutkus89.samplelib.sampleapp"
         minSdkVersion 16
-        targetSdkVersion 31
+        targetSdkVersion 32
         versionCode 1153
         // versionName uses the following format:
         // "LIBRARY_MAJOR.LIBRARY_MINOR.LIBRARY_PATCH.APPLICATION_BUILD_NUMBER"
