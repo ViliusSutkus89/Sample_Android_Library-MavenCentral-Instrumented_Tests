@@ -102,7 +102,7 @@ Environment contains the following secrets:
 #### TenMinuteWait - (fullRelease workflow, releaseGitHub job)
 A timed gate. Release propagation to MavenCentral takes over ten minutes. Timed gate waits a set amount of time without having a build job running.
 
-#### SampleAppKeystore - (fullRelease and appRelease workflows, buildSampleApp job)
+#### SampleAppKeystore - (fullRelease and appRelease workflows, buildSampleApp job; privilegedBuild workflow, buildSampleAppAgainstUnReleasedLibrary and buildSampleAppAgainstReleasedLibrary jobs)
 Environment contains the following secrets:  
 `APP_SIGNING_KEYFILE_BASE64`, `APP_SIGNING_PASS`, `APP_SIGNING_ALIAS` - keystore used for sample application signing.
 
