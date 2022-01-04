@@ -288,3 +288,13 @@ On release, production environment builds the sample application again, which do
 Publishing to MavenCentral requires setting up an account with Sonatype.  
 Follow the [Getting started guide](https://central.sonatype.org/publish/publish-guide/).  
 [Publish-plugin](https://github.com/gradle-nexus/publish-plugin) is a required read to figure out how to set Sonatype host to s01.oss.sonatype.org.
+
+## Version
+
+Library is versioned semantically - `$Major.$Minor.$Patch`.\
+Library patch version is incremented automatically after each release.
+
+Application consumes previously released library. Previously released library has version lower than CURRENT version in source control.
+
+Application is versioned by appending release number to library version, resulting in `$LibraryMajor.$LibraryMinor.$LibraryPatch.$ApplicationReleaseNumber`.\
+Since version 2.0.0, application release number is always incremental, does not reset to zero after library releases. 

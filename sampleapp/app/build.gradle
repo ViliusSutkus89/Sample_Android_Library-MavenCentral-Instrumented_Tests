@@ -8,7 +8,7 @@ android {
         targetSdkVersion 32
         versionCode 1153
         // versionName uses the following format:
-        // "LIBRARY_MAJOR.LIBRARY_MINOR.LIBRARY_PATCH.APPLICATION_BUILD_NUMBER"
+        // "LIBRARY_MAJOR.LIBRARY_MINOR.LIBRARY_PATCH.APPLICATION_RELEASE_NUMBER"
         versionName '1.4.0.1'
 
         resValue("string", "GIT_COMMMIT", "${System.env.GITHUB_SHA}")
