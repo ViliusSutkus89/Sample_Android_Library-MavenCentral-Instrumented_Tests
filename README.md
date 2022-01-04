@@ -1,7 +1,8 @@
 # Sample Android library
-The purpose of this project is to provide a sample library with a particular set of CI/CD features.  
 [![privilegedBuild](https://github.com/ViliusSutkus89/Sample_Android_Library-MavenCentral-Instrumented_Tests/actions/workflows/privilegedBuild.yml/badge.svg)](https://github.com/ViliusSutkus89/Sample_Android_Library-MavenCentral-Instrumented_Tests/actions/workflows/privilegedBuild.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/com.viliussutkus89/samplelib.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:com.viliussutkus89%20AND%20a:samplelib)
+
+The purpose of this project is to provide a sample library with a particular set of CI/CD features.
 
 ```gradle
 dependencies {
