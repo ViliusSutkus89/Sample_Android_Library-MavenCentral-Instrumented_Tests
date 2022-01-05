@@ -6,10 +6,10 @@ android {
         applicationId "com.viliussutkus89.samplelib.sampleapp"
         minSdkVersion 16
         targetSdkVersion 32
-        versionCode 11252
+        versionCode 11253
         // versionName uses the following format:
         // "LIBRARY_MAJOR.LIBRARY_MINOR.LIBRARY_PATCH.APPLICATION_RELEASE_NUMBER"
-        versionName '2.0.0.1'
+        versionName '2.0.0.2'
 
         resValue("string", "GIT_COMMMIT", "${System.env.GITHUB_SHA}")
     }
