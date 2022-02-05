@@ -1,9 +1,9 @@
 #  MIT License
 #
-#  Copyright (c) 2021 Vilius Sutkus <ViliusSutkus89@gmail.com>
+#  Copyright (c) 2021 - 2022 ViliusSutkus89.com
 #
 #  https://github.com/ViliusSutkus89/Sample_Android_Library-MavenCentral-Instrumented_Tests
-#  .github/workflows/unprivilegedBuild.yml - v2.0.0
+#  .github/workflows/unprivilegedBuild.yml - v2.1.0
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,11 @@ on:
   workflow_dispatch:
   push:
     branches-ignore: [ master, main ]
+    paths-ignore:
+      - '**.md'
+      - '.github/**'
+      - '!.github/workflows/unprivilegedBuild.yml'
+  pull_request:
     paths-ignore:
       - '**.md'
       - '.github/**'
@@ -59,11 +64,10 @@ jobs:
 
       - run: ./gradlew build lintRelease
 
-      - run: mv lib/build/reports/lint-results-release.html library-lint-report.html
       - uses: actions/upload-artifact@v2
         with:
-          name: library-lint-report.html
-          path: library-lint-report.html
+          name: library-lint-report
+          path: lib/build/reports/lint-results-release.html
 
       - run: ./gradlew publishToMavenLocal
       - uses: actions/upload-artifact@v2
@@ -111,21 +115,54 @@ jobs:
       - name: Prepare library to run instrumented tests on staging library
         run: ./ci-scripts/prepareLibraryTestsForStagingRepository lib --output=build/lib-staging --repository=mavenLocal
 
-      - uses: reactivecircus/android-emulator-runner@v2
+      # Needed for the temp workaround in the next step
+      - name: Create AVD and generate snapshot
+        uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
           arch: ${{ matrix.arch }}
           target: ${{ matrix.api-type-target }}
-          script: ./gradlew connectedCheck
-          working-directory: build/lib-staging
+          sdcard-path-or-size: 1G
+          script: echo "Generated AVD snapshot."
 
-      - run: tar -cvf instrumentedTestsReport-${{ matrix.api-level }}-${{ matrix.arch }}.tar build/lib-staging/lib/build/reports/androidTests/connected
-        if: always()
+      # Temp workaround, until https://github.com/ReactiveCircus/android-emulator-runner/pull/219 is included in a release
+      - name: Increate storage size for emulator
+        run: echo "disk.dataPartition.size=8G" >> /Users/runner/.android/avd/test.avd/config.ini
+
+      - name: Run tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-snapshot-save
+          api-level: ${{ matrix.api-level }}
+          arch: ${{ matrix.arch }}
+          target: ${{ matrix.api-type-target }}
+          sdcard-path-or-size: 1G
+          working-directory: build/lib-staging
+          script: |
+            mkdir -p testResults/screenshots
+            adb logcat > testResults/logcat.txt &
+
+            adb shell screencap /data/local/tmp/beforeTests.png
+            adb pull /data/local/tmp/beforeTests.png testResults/screenshots/
+
+            ./gradlew connectedCheck || touch sorry_but_tests_are_failing
+            adb pull /sdcard/Pictures/screenshots testResults/ || true
+
+            adb shell screencap /data/local/tmp/afterTests.png
+            adb pull /data/local/tmp/afterTests.png testResults/screenshots/
+
+            mv lib/build/reports/androidTests/connected testResults/
+            mv lib/build/outputs/androidTest-results testResults/
+
+            test ! -f sorry_but_tests_are_failing
+
       - uses: actions/upload-artifact@v2
         if: always()
         with:
-          name: instrumentedTestsReport-${{ matrix.api-level }}-${{ matrix.arch }}.tar
-          path: instrumentedTestsReport-${{ matrix.api-level }}-${{ matrix.arch }}.tar
+          name: testResults-${{ matrix.api-level }}-${{ matrix.arch }}-${{ matrix.api-type-target }}
+          path: build/lib-staging/testResults
+          if-no-files-found: error
 
   buildSampleAppAgainstUnreleasedLibrary:
     needs: buildLibrary
@@ -156,11 +193,10 @@ jobs:
           path: build/sampleapp-staging/app/build/outputs/apk/**/*.apk
           if-no-files-found: error
 
-      - run: mv build/sampleapp-staging/app/build/reports/lint-results-release.html sampleapp-lint-report.html
       - uses: actions/upload-artifact@v2
         with:
-          name: sampleapp-lint-report.html
-          path: sampleapp-lint-report.html
+          name: sampleapp-lint-report
+          path: build/sampleapp-staging/app/build/reports/lint-results-release.html
           if-no-files-found: error
 
   buildSampleAppAgainstReleasedLibrary:
@@ -183,9 +219,8 @@ jobs:
           path: sampleapp/app/build/outputs/apk/**/*.apk
           if-no-files-found: error
 
-      - run: mv sampleapp/app/build/reports/lint-results-release.html sampleapp-lint-report.html
       - uses: actions/upload-artifact@v2
         with:
-          name: sampleapp-lint-report.html
-          path: sampleapp-lint-report.html
+          name: sampleapp-lint-report
+          path: mv sampleapp/app/build/reports/lint-results-release.html
           if-no-files-found: error

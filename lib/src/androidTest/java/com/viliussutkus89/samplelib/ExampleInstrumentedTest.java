@@ -1,11 +1,23 @@
 package com.viliussutkus89.samplelib;
 
-import androidx.test.ext.junit.runners.AndroidJUnit4;
+import static org.junit.Assert.assertNotEquals;
 
+import android.Manifest;
+import android.graphics.Bitmap;
+
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.rule.GrantPermissionRule;
+import androidx.test.runner.screenshot.ScreenCapture;
+import androidx.test.runner.screenshot.Screenshot;
+
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 
-import static org.junit.Assert.assertNotEquals;
+import java.io.IOException;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -14,13 +26,31 @@ import static org.junit.Assert.assertNotEquals;
  */
 @RunWith(AndroidJUnit4.class)
 public class ExampleInstrumentedTest {
-  @Test
-  public void useGetVersion() {
-    assertNotEquals("0", VersionGetter.getVersion());
-  }
+    @Rule
+    public RuleChain screenshotRule = RuleChain
+            .outerRule(GrantPermissionRule.grant(Manifest.permission.WRITE_EXTERNAL_STORAGE))
+            .around(new TestWatcher() {
+                @Override
+                protected void failed(Throwable e, Description description) {
+                    super.failed(e, description);
+                    ScreenCapture capture = Screenshot.capture()
+                            .setName(description.getTestClass().getSimpleName() + "-" + description.getMethodName())
+                            .setFormat(Bitmap.CompressFormat.PNG);
+                    try {
+                        capture.process();
+                    } catch (IOException err) {
+                        err.printStackTrace();
+                    }
+                }
+            });
 
-  @Test
-  public void useGetGitCommit() {
-    assertNotEquals("xxx", VersionGetter.getGitCommit());
-  }
+    @Test
+    public void useGetVersion() {
+        assertNotEquals("0", VersionGetter.getVersion());
+    }
+
+    @Test
+    public void useGetGitCommit() {
+        assertNotEquals("xxx", VersionGetter.getGitCommit());
+    }
 }
