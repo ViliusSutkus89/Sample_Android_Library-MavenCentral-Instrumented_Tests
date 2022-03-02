@@ -53,7 +53,7 @@ jobs:
       STAGING_REPO_URL: ${{ steps.sonatype.outputs.stagingRepoUrl }}
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-java@v2
         with:
           distribution: zulu
@@ -120,7 +120,7 @@ jobs:
             api-level: 32
             api-type-target: google_apis
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-java@v2
         with:
           distribution: zulu
@@ -192,7 +192,7 @@ jobs:
     environment: SampleAppKeystore
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-java@v2
         with:
           distribution: zulu
@@ -234,7 +234,7 @@ jobs:
     environment: SampleAppKeystore
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-java@v2
         with:
           distribution: zulu
