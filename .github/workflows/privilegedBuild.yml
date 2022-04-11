@@ -62,7 +62,7 @@ jobs:
 
       - run: ./gradlew build lintRelease
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: library-lint-report
           path: lib/build/reports/lint-results-release.html
@@ -90,7 +90,7 @@ jobs:
 
       # Tar the maven-local dir, to attach as a single file to GitHub Release
       - run: tar -cvf maven-local.tar ~/.m2
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: maven-local.tar
           path: maven-local.tar
@@ -180,7 +180,7 @@ jobs:
 
             test ! -f sorry_but_tests_are_failing
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: always()
         with:
           name: testResults-${{ matrix.api-level }}-${{ matrix.arch }}-${{ matrix.api-type-target }}
@@ -217,13 +217,13 @@ jobs:
           APP_SIGNING_PASS: ${{ secrets.APP_SIGNING_PASS }}
           APP_SIGNING_ALIAS: ${{ secrets.APP_SIGNING_ALIAS }}
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: APKs
           path: build/sampleapp-staging/app/build/outputs/apk/**/*.apk
           if-no-files-found: error
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: sampleapp-staging-lint-report
           path: build/sampleapp-staging/app/build/reports/lint-results-release.html
@@ -255,13 +255,13 @@ jobs:
           APP_SIGNING_PASS: ${{ secrets.APP_SIGNING_PASS }}
           APP_SIGNING_ALIAS: ${{ secrets.APP_SIGNING_ALIAS }}
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: APKs
           path: sampleapp/app/build/outputs/apk/**/*.apk
           if-no-files-found: error
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: sampleapp-lint-report
           path: sampleapp/app/build/reports/lint-results-release.html

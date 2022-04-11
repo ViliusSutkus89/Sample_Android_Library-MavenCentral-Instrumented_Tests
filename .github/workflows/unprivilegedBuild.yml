@@ -64,13 +64,13 @@ jobs:
 
       - run: ./gradlew build lintRelease
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: library-lint-report
           path: lib/build/reports/lint-results-release.html
 
       - run: ./gradlew publishToMavenLocal
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: maven-local
           path: ~/.m2
@@ -157,7 +157,7 @@ jobs:
 
             test ! -f sorry_but_tests_are_failing
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: always()
         with:
           name: testResults-${{ matrix.api-level }}-${{ matrix.arch }}-${{ matrix.api-type-target }}
@@ -187,13 +187,13 @@ jobs:
         run: ./gradlew build lintRelease
         working-directory: build/sampleapp-staging
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: APKs
           path: build/sampleapp-staging/app/build/outputs/apk/**/*.apk
           if-no-files-found: error
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: sampleapp-lint-report
           path: build/sampleapp-staging/app/build/reports/lint-results-release.html
@@ -213,13 +213,13 @@ jobs:
       - run: ./gradlew build lintRelease
         working-directory: sampleapp
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: APKs
           path: sampleapp/app/build/outputs/apk/**/*.apk
           if-no-files-found: error
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: sampleapp-lint-report
           path: mv sampleapp/app/build/reports/lint-results-release.html
