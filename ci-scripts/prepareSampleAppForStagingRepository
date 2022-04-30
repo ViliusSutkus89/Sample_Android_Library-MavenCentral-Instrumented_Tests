@@ -80,27 +80,30 @@ my $sampleAppStaging = fileUpdater->new({
     outputDirectory => $outputDirectory
 });
 
+# Copy root project files
 $sampleAppStaging->update([ 'gradle', 'gradlew', 'gradle.properties', 'build.gradle' ]);
+
+# Change root project name
 $sampleAppStaging->update('settings.gradle', sub {
     $_ = shift;
-    s/\/\/#STAGING-REPOSITORY#/$repository/;
     s/^(rootProject\.name\s*=\s*[\"\'].+)([\"\'])$/${1}-staging-aar${2}/;
     return $_;
 });
 
+# Add mavenLocal or Sonatype repository
+$sampleAppStaging->append('settings.gradle', "dependencyResolutionManagement.repositories { $repository }\n");
+
+# Copy app files
 $sampleAppStaging->update($appProjectName, undef, sub {
     $_ = shift;
     # Exclude sampleapp/app/build/
     if (/$appProjectName\/build\//) {
         return undef;
     }
-    # Exclude sampleapp/app/build.gradle, because it will be added by the next update call
-    if (/$appProjectName\/build\.gradle$/) {
-        return undef;
-    }
     return $_;
 });
 
+# Update app version and depend on unreleased library version
 $sampleAppStaging->update("$appProjectName/build.gradle", sub {
     $_ = shift;
     s/(versionName\s+["']).+(["'])/${1}${appVersion}${2}/;
