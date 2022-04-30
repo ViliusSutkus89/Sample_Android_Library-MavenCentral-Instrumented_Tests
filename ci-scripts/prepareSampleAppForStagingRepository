@@ -80,7 +80,7 @@ my $sampleAppStaging = fileUpdater->new({
     outputDirectory => $outputDirectory
 });
 
-$sampleAppStaging->update([ 'gradle', 'gradlew', 'gradle.properties' ]);
+$sampleAppStaging->update([ 'gradle', 'gradlew', 'gradle.properties', 'build.gradle' ]);
 $sampleAppStaging->update('settings.gradle', sub {
     $_ = shift;
     s/\/\/#STAGING-REPOSITORY#/$repository/;

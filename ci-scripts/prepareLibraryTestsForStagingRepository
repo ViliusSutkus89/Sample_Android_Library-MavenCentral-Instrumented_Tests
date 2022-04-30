@@ -76,7 +76,7 @@ my $aarStaging = fileUpdater->new({
     rootDirectory   => $rootDirectory,
     outputDirectory => $outputDirectory
 });
-$aarStaging->update([ 'gradle', 'gradlew', 'gradle.properties' ]);
+$aarStaging->update([ 'gradle', 'gradlew', 'gradle.properties', 'build.gradle' ]);
 $aarStaging->update('settings.gradle', sub {
     $_ = shift;
     s/\/\/#STAGING-REPOSITORY#/$repository/;
