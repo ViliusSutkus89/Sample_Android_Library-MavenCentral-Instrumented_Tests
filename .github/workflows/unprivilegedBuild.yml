@@ -115,17 +115,6 @@ jobs:
       - name: Prepare library to run instrumented tests on staging library
         run: ./ci-scripts/prepareLibraryTestsForStagingRepository lib --output=build/lib-staging --repository=mavenLocal
 
-      # Needed for the temp workaround in the next step
-      - name: Create AVD and generate snapshot
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          arch: ${{ matrix.arch }}
-          target: ${{ matrix.api-type-target }}
-          sdcard-path-or-size: 1G
-          disk-size: 8G
-          script: echo "Generated AVD snapshot."
-
       - name: Run tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
