@@ -146,6 +146,7 @@ jobs:
           arch: ${{ matrix.arch }}
           target: ${{ matrix.api-type-target }}
           sdcard-path-or-size: 1G
+          disk-size: 8G
           script: echo "Generated AVD snapshot for caching."
 
       - name: Run tests
