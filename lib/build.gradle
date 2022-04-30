@@ -1,8 +1,10 @@
-group = 'com.viliussutkus89'
+plugins {
+    id 'com.android.library'
+    id 'maven-publish'
+    id 'signing'
+}
 
-apply plugin: 'com.android.library'
-apply plugin: 'maven-publish'
-apply plugin: 'signing'
+group = 'com.viliussutkus89'
 
 android {
     compileSdkVersion 32

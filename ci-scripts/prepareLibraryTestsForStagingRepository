@@ -1,10 +1,10 @@
 #!/usr/bin/env perl
 #  MIT License
 #
-#  Copyright (c) 2021 Vilius Sutkus <ViliusSutkus89@gmail.com>
+#  Copyright (c) 2021 - 2022 ViliusSutkus89.com
 #
 #  https://github.com/ViliusSutkus89/Sample_Android_Library-MavenCentral-Instrumented_Tests
-#  ci-scripts/prepareLibraryTestsForStagingRepository - v1.1.5
+#  ci-scripts/prepareLibraryTestsForStagingRepository - v2.1.0
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -77,13 +77,9 @@ my $aarStaging = fileUpdater->new({
     outputDirectory => $outputDirectory
 });
 $aarStaging->update([ 'gradle', 'gradlew', 'gradle.properties' ]);
-$aarStaging->update('build.gradle', sub {
-    $_ = shift;
-    s/\/\/#STAGING-REPOSITORY#/$repository/;
-    return $_;
-});
 $aarStaging->update('settings.gradle', sub {
     $_ = shift;
+    s/\/\/#STAGING-REPOSITORY#/$repository/;
     s/^(rootProject\.name\s*=\s*["'].+)(["'])$/${1}${suffix}${2}/;
     return $_;
 });
