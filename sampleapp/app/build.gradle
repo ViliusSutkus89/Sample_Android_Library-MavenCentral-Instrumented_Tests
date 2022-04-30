@@ -8,10 +8,10 @@ android {
         applicationId "com.viliussutkus89.samplelib.sampleapp"
         minSdkVersion 16
         targetSdkVersion 32
-        versionCode 11253
+        versionCode 12352
         // versionName uses the following format:
         // "LIBRARY_MAJOR.LIBRARY_MINOR.LIBRARY_PATCH.APPLICATION_RELEASE_NUMBER"
-        versionName '2.0.0.2'
+        versionName '2.1.0.2'
 
         resValue("string", "GIT_COMMMIT", "${System.env.GITHUB_SHA}")
     }
@@ -33,6 +33,6 @@ android {
 }
 
 dependencies {
-    implementation 'com.viliussutkus89:samplelib:2.0.0'
+    implementation 'com.viliussutkus89:samplelib:2.1.0'
 }
 
