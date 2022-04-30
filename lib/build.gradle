@@ -42,12 +42,6 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 }
 
-task sourceJar(type: Jar) {
-    archiveClassifier.set('sources')
-    into ("", { from android.sourceSets.main.java.srcDirs} )
-    into ("", { from file("../LICENSE")})
-}
-
 afterEvaluate {
     publishing {
         publications {
