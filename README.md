@@ -1,5 +1,5 @@
 # Sample Android library
-[![privilegedBuild](https://github.com/ViliusSutkus89/Sample_Android_Library-MavenCentral-Instrumented_Tests/actions/workflows/privilegedBuild.yml/badge.svg)](https://github.com/ViliusSutkus89/Sample_Android_Library-MavenCentral-Instrumented_Tests/actions/workflows/privilegedBuild.yml)
+[![vuild](https://github.com/ViliusSutkus89/Sample_Android_Library-MavenCentral-Instrumented_Tests/actions/workflows/build.yml/badge.svg)](https://github.com/ViliusSutkus89/Sample_Android_Library-MavenCentral-Instrumented_Tests/actions/workflows/build.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/com.viliussutkus89/samplelib.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:com.viliussutkus89%20AND%20a:samplelib)
 
 The purpose of this project is to provide a sample library with a particular set of CI/CD features.
@@ -24,7 +24,7 @@ FullRelease releases both library and application. AppRelease only releases the 
 
 ## Workflows
 
-#### [privilegedBuild.yml](.github/workflows/privilegedBuild.yml)
+#### [build.yml](.github/workflows/build.yml)
 Triggered either by push to main/master branch or manually (`workflow_dispatch`).  
 Composed of three jobs:
 1) buildLibrary:
@@ -44,7 +44,7 @@ Composed of three jobs:
 #### [fullRelease.yml](.github/workflows/fullRelease.yml)
 Triggered manually (`workflow_dispatch`).  
 Requires input variable `STAGING_REPO_URL`, which is printed as a warning in
-`buildLibrary` build job of `privilegedBuild.yml` workflow.  
+`buildLibrary` build job of `build.yml` workflow.  
 Composed of three jobs:
 1) releaseSonatype:  
    Promotes the Sonatype staging repository to MavenCentral.
@@ -91,7 +91,7 @@ Used to increment project version and commit changes to source control.
 
 ## Environments
 
-#### LibraryKeyAndSonatypeAccess - (privilegedBuild workflow, buildLibrary job)
+#### LibraryKeyAndSonatypeAccess - (build workflow, buildLibrary job)
 Environment contains the following secrets:  
 `SIGNING_KEY`, `SIGNING_PASS` - ASCII armored private key and password used for signing library artifacts.  
 `SONATYPE_USERNAME`, `SONATYPE_PASSWORD` - User token (not the actual login to oss.sonatype.org), obtained through oss.sonatype.org -> Profile -> User Token.
@@ -103,7 +103,7 @@ Environment contains the following secrets:
 #### TenMinuteWait - (fullRelease workflow, releaseGitHub job)
 A timed gate. Release propagation to MavenCentral takes over ten minutes. Timed gate waits a set amount of time without having a build job running.
 
-#### SampleAppKeystore - (fullRelease and appRelease workflows, buildSampleApp job; privilegedBuild workflow, buildSampleAppAgainstUnReleasedLibrary and buildSampleAppAgainstReleasedLibrary jobs)
+#### SampleAppKeystore - (fullRelease and appRelease workflows, buildSampleApp job; build workflow, buildSampleAppAgainstUnReleasedLibrary and buildSampleAppAgainstReleasedLibrary jobs)
 Environment contains the following secrets:  
 `APP_SIGNING_KEYFILE_BASE64`, `APP_SIGNING_PASS`, `APP_SIGNING_ALIAS` - keystore used for sample application signing.
 
@@ -275,12 +275,12 @@ Updates version and versionCode in downstream files (this README.md, sample appl
 Library contains sources and instrumented tests.  
 Used to extract instrumented tests from the library into a new project, which does not have library sources.
 The newly created project depends on the previously built library, which is deployed to a staging repository.
-Staging repository is either in MavenCentral (privilegedBuild workflow) or MavenLocal (unprivilegedBuild workflow).
+Staging repository is either in MavenCentral (build workflow) or MavenLocal (unprivilegedBuild workflow).
 
 #### [prepareSampleAppForStagingRepository](ci-scripts/prepareSampleAppForStagingRepository)
 Sample application depends on a released version of the library.
 This script modifies sample application to create a new temporary project, which depends on library in staging repository.
-Using by the build jobs of privilegedBuild and unprivilegedBuild workflows.
+Using by the build jobs of build and unprivilegedBuild workflows.
 On release, production environment builds the sample application again, which does not rely on this script.
 
 ## MavenCentral

@@ -3,7 +3,8 @@
 #  Copyright (c) 2021 - 2022 ViliusSutkus89.com
 #
 #  https://github.com/ViliusSutkus89/Sample_Android_Library-MavenCentral-Instrumented_Tests
-#  .github/workflows/privilegedBuild.yml - v2.1.1
+#  .github/workflows/build.yml - v2.2.0
+#  Renamed from .github/workflows/privilegedBuild.yml
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +24,7 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
-name: privilegedBuild
+name: build
 on:
   workflow_dispatch:
   push:
@@ -31,7 +32,7 @@ on:
     paths-ignore:
       - '**.md'
       - '.github/**'
-      - '!.github/workflows/privilegedBuild.yml'
+      - '!.github/workflows/build.yml'
 
 permissions:
   actions: none
@@ -88,7 +89,6 @@ jobs:
           SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
           SIGNING_PASS: ${{ secrets.SIGNING_PASS }}
 
-      # Tar the maven-local dir, to attach as a single file to GitHub Release
       - run: tar -cvf maven-local.tar ~/.m2
       - uses: actions/upload-artifact@v3
         with:

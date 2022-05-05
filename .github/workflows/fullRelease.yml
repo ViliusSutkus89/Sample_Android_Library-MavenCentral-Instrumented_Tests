@@ -28,7 +28,7 @@ on:
   workflow_dispatch:
     inputs:
       STAGING_REPO_URL:
-        description: 'Provided by privilegedBuild.yml (example: https://oss.sonatype.org/service/local/repositories/comviliussutkus89-????/content/)'
+        description: 'Provided by build.yml (example: https://oss.sonatype.org/service/local/repositories/comviliussutkus89-????/content/)'
         required: true
 
 permissions:
