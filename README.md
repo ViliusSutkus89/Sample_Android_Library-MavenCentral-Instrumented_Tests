@@ -85,9 +85,10 @@ Composed of three jobs:
    1) Runs instrumented tests on a matrix of emulated Android devices against the library deployed to a staging repository in MavenLocal (~/.m2).
    1) Artifacts test reports.
 
-#### [manualVersionIncrement_{major,minor,patch}.yml](.github/workflows/manualVersionIncrement_major.yml)
+#### incrementVersion.yml](.github/workflows/incrementVersion.yml)
 Triggered only manually (`workflow_dispatch`).  
-Used to increment project version and commit changes to source control.
+Used to increment project version and commit changes to source control.  
+Takes the same arguments as the [ci-scripts/incrementVersion](ci-scripts/incrementVersion) script.
 
 ## Environments
 
