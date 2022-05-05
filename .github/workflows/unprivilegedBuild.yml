@@ -62,18 +62,19 @@ jobs:
           java-version: 11
       - uses: android-actions/setup-android@v2
 
-      - run: ./gradlew build lintRelease
+      - run: ./gradlew publishToMavenLocal lintRelease
 
       - uses: actions/upload-artifact@v3
         with:
           name: library-lint-report
           path: lib/build/reports/lint-results-release.html
+          if-no-files-found: error
 
-      - run: ./gradlew publishToMavenLocal
       - uses: actions/upload-artifact@v3
         with:
           name: maven-local
           path: ~/.m2
+          if-no-files-found: error
 
   runInstrumentedTests:
     needs: buildLibrary

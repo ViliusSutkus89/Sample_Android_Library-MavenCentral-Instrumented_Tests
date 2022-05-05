@@ -61,15 +61,7 @@ jobs:
           java-version: 11
       - uses: android-actions/setup-android@v2
 
-      - run: ./gradlew build lintRelease
-
-      - uses: actions/upload-artifact@v3
-        with:
-          name: library-lint-report
-          path: lib/build/reports/lint-results-release.html
-
-      - name: Publish to Sonatype
-        run: ./gradlew publishToSonatype closeSonatypeStagingRepository | tee publishToSonatype.log
+      - run: ./gradlew lintRelease publishToMavenLocal publishToSonatype closeSonatypeStagingRepository | tee publishToSonatype.log
         # bash has pipefail on by default, which is needed for tee to fail, if gradle fails
         shell: bash
         env:
@@ -84,16 +76,18 @@ jobs:
         # Created staging repository 'comviliussutkus89-1055' at https://oss.sonatype.org/service/local/repositories/comviliussutkus89-1055/content/
         run: perl -ne 'print "::set-output name=stagingRepoUrl::$2\n::warning ::$1\n" if /^(Created staging repository .+ at (.+))$/' < publishToSonatype.log
 
-      - run: ./gradlew publishToMavenLocal
-        env:
-          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
-          SIGNING_PASS: ${{ secrets.SIGNING_PASS }}
+      - uses: actions/upload-artifact@v3
+        with:
+          name: library-lint-report
+          path: lib/build/reports/lint-results-release.html
+          if-no-files-found: error
 
       - run: tar -cvf maven-local.tar ~/.m2
       - uses: actions/upload-artifact@v3
         with:
           name: maven-local.tar
           path: maven-local.tar
+          if-no-files-found: error
 
   runInstrumentedTests:
     needs: buildLibrary
